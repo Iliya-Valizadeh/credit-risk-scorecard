@@ -7,7 +7,7 @@ scoring demo.
 
 > **Status:** Core pipeline shipped — data understanding, a class-weighted logistic
 > baseline and a LightGBM model, threshold analysis, and a bank-style model-risk write-up
-> are complete (see Results). SHAP and calibration figures are the remaining polish.
+> are complete, including SHAP explainability and a calibration curve (see Results).
 > Every number below was produced by code in this repo; nothing is fabricated.
 
 ---
@@ -65,6 +65,22 @@ Illustrative operating point: **0.40** catches ~51% of defaulters while flagging
 applicants — the exact cut a lender sets depends on the relative cost of a missed default
 versus a declined good customer.
 
+## Explainability & calibration
+
+**Global feature importance (SHAP).** Consistent with the EDA, the external credit scores
+`EXT_SOURCE_3/2/1` dominate, followed by the engineered `ANNUITY_CREDIT_RATIO` and
+education level. Low external scores push predictions toward default.
+
+![SHAP summary](reports/figures/shap_summary.png)
+
+**Calibration.** The model ranks well (ROC-AUC 0.74) but is **not** well-calibrated: it
+over-predicts probability of default (the curve sits below the diagonal), a side effect of
+the `scale_pos_weight` used to handle the 1:12 class imbalance. Before these scores could
+feed expected-loss provisioning or risk-based pricing, they would need a post-hoc
+recalibration step (isotonic or Platt).
+
+![Calibration curve](reports/figures/calibration.png)
+
 ## Limitations
 
 Trained on a 17k-row sample, not the full 307k (headline metrics are therefore
@@ -116,9 +132,3 @@ Then follow [`data/README.md`](data/README.md) to download the dataset, and run:
 
 \`\`\`bash
 python -m src.data_load
-\`\`\`
-
-## Author
-
-Iliya Valizadeh — BSc Data Science, York University.
-GitHub: [Iliya-Valizadeh](https://github.com/Iliya-Valizadeh)

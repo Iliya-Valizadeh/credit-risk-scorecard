@@ -17,8 +17,6 @@ venv/
 # Models / artifacts
 *.pkl
 *.joblib
-reports/figures/*.png
-!reports/figures/.gitkeep
 
 # OS / editor
 .DS_Store
