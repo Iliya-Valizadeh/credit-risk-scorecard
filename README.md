@@ -5,9 +5,10 @@ bank's model-risk team would expect: SQL feature pipeline in PostgreSQL, a calib
 and explainable classifier, threshold analysis tied to a business decision, and a small
 scoring demo.
 
-> **Status:** In progress. This README is the target spec; sections marked _(pending)_
-> are filled in as each weekly gate ships. No number appears here that hasn't been
-> produced by code in this repo.
+> **Status:** Core pipeline shipped — data understanding, a class-weighted logistic
+> baseline and a LightGBM model, threshold analysis, and a bank-style model-risk write-up
+> are complete (see Results). SHAP and calibration figures are the remaining polish.
+> Every number below was produced by code in this repo; nothing is fabricated.
 
 ---
 
