@@ -1,0 +1,12 @@
+-- W1-W2: SQL feature engineering.
+-- Joins/aggregates supporting tables onto application_train.
+-- Keep each feature commented with its rationale.
+
+-- Example: count and mean of prior credit bureau records per applicant.
+-- SELECT
+--     a.SK_ID_CURR,
+--     COUNT(b.SK_ID_BUREAU)   AS bureau_count,
+--     AVG(b.AMT_CREDIT_SUM)   AS bureau_avg_credit
+-- FROM application_train a
+-- LEFT JOIN bureau b ON b.SK_ID_CURR = a.SK_ID_CURR
+-- GROUP BY a.SK_ID_CURR;
