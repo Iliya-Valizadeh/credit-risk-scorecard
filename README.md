@@ -1,14 +1,14 @@
 # Credit-Risk Scorecard
 
-A credit default risk model on the Home Credit Default Risk dataset, built the way a
-bank's model-risk team would expect: SQL feature pipeline in PostgreSQL, a calibrated
-and explainable classifier, threshold analysis tied to a business decision, and a small
-scoring demo.
+A credit default model on the public Home Credit Default Risk dataset. SQL feature
+pipeline in PostgreSQL, a logistic regression baseline and a LightGBM model, and then the
+part that interested me more: what the model costs you at each approval cut-off, whether
+its probabilities can be trusted, and which features it is actually leaning on.
 
-> **Status:** Core pipeline shipped — data understanding, a class-weighted logistic
-> baseline and a LightGBM model, threshold analysis, and a bank-style model-risk write-up
-> are complete, including SHAP explainability and a calibration curve (see Results).
-> Every number below was produced by code in this repo; nothing is fabricated.
+> **Status:** Complete. Data understanding, a class-weighted logistic baseline, a LightGBM
+> model, threshold analysis, SHAP explainability, a calibration curve and a written
+> model-risk note are all in. Every number below came out of code in this repo, and the
+> limitations section at the end is worth reading before the results are.
 
 ---
 
