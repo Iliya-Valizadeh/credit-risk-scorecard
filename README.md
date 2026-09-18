@@ -30,14 +30,14 @@ application and bureau data.
 ## Method
 
 1. **Load** raw CSVs into PostgreSQL (`src/data_load.py`).
-2. **Feature engineering in SQL** — joins/aggregate features across bureau and previous-application tables (`sql/features.sql`).
-3. **pandas feature engineering** — ratios, missingness flags, encoding (`src/features.py`).
-4. **Baseline model** — logistic regression, the interpretable scorecard reference (`src/model.py`).
-5. **Gradient boosting** — LightGBM, tuned (`src/model.py`).
-6. **Evaluation** — AUC, precision/recall at chosen operating thresholds, calibration curve (`src/evaluate.py`).
-7. **Explainability** — SHAP global + local (`src/explain.py`).
-8. **Model-risk write-up** — why calibration and explainability matter to a bank ([`reports/model_risk_writeup.md`](reports/model_risk_writeup.md)).
-9. **Scoring demo** — Streamlit app that scores a single applicant (`app/streamlit_app.py`).
+2. **Feature engineering in SQL**: joins/aggregate features across bureau and previous-application tables (`sql/features.sql`).
+3. **pandas feature engineering**: ratios, missingness flags, encoding (`src/features.py`).
+4. **Baseline model**: logistic regression, the interpretable scorecard reference (`src/model.py`).
+5. **Gradient boosting**: LightGBM, tuned (`src/model.py`).
+6. **Evaluation**: AUC, precision/recall at chosen operating thresholds, calibration curve (`src/evaluate.py`).
+7. **Explainability**: SHAP global + local (`src/explain.py`).
+8. **Model-risk write-up**: why calibration and explainability matter to a bank ([`reports/model_risk_writeup.md`](reports/model_risk_writeup.md)).
+9. **Scoring demo**: Streamlit app that scores a single applicant (`app/streamlit_app.py`).
 
 ## Results
 
@@ -62,7 +62,7 @@ defaulters against how many applicants get flagged (declined):
 | 0.70 | 0.274 | 0.116 | 0.033 |
 
 Illustrative operating point: **0.40** catches ~51% of defaulters while flagging ~23% of
-applicants — the exact cut a lender sets depends on the relative cost of a missed default
+applicants. The exact cut a lender sets depends on the relative cost of a missed default
 versus a declined good customer.
 
 ## Explainability & calibration
