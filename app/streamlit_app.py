@@ -26,8 +26,8 @@ if not ART.exists():
     st.stop()
 
 art = joblib.load(ART)
-pre, model, template, threshold = (
-    art["preprocessor"], art["model"], art["template"], art["threshold"]
+pre, model, calibrator, template, threshold = (
+    art["preprocessor"], art["model"], art["calibrator"], art["template"], art["threshold"]
 )
 
 st.caption("Enter a few fields; the rest default to a typical applicant.")
@@ -41,7 +41,9 @@ with c2:
     annuity = st.number_input("Annuity (AMT_ANNUITY)", 5000, 300000, 27000, 1000)
     age = st.slider("Age", 21, 70, 40)
 
-thr = st.slider("Decision threshold (PD above this = decline)", 0.05, 0.95, float(threshold), 0.01)
+st.caption(f"Decline rule: raw model score of {threshold:.3f} or above, which declines the "
+           "riskiest 20% of applicants in the calibration split. The PD shown is the "
+           "isotonic-calibrated one.")
 
 if st.button("Score applicant"):
     row = dict(template)
@@ -51,10 +53,12 @@ if st.button("Score applicant"):
         "AMT_ANNUITY": annuity, "DAYS_BIRTH": -age * 365,
     })
     X = F.clean(pd.DataFrame([row]))
-    proba = float(model.predict_proba(pre.transform(X))[:, 1][0])
-    st.metric("Probability of default", f"{proba*100:.1f}%")
-    if proba >= thr:
-        st.error(f"DECLINE — PD {proba*100:.1f}% ≥ threshold {thr*100:.0f}%")
+    score = float(model.predict_proba(pre.transform(X))[:, 1][0])
+    pd_cal = float(calibrator.predict([score])[0])
+    st.metric("Probability of default (calibrated)", f"{pd_cal*100:.1f}%")
+    st.caption(f"Raw model score: {score:.3f}")
+    if score >= threshold:
+        st.error(f"DECLINE: score {score:.3f} is at or above {threshold:.3f}")
     else:
-        st.success(f"APPROVE — PD {proba*100:.1f}% < threshold {thr*100:.0f}%")
+        st.success(f"APPROVE: score {score:.3f} is below {threshold:.3f}")
     st.caption("Demo only — not a real lending decision.")
