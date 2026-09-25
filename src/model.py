@@ -258,7 +258,7 @@ def results_markdown(m: dict) -> str:
           f"| Implied by observed outcomes | {el['loss_implied_by_outcomes']:,.0f} |", "",
           f"## Group check at threshold {m['fairness']['threshold']:.3f}", ""]
     for key, title in [("gender", "CODE_GENDER"), ("age_band", "Age band")]:
-        L += [f"**{title}**", "",
+        L += [f"### {title}", "",
               "| Group | n | Observed default rate | Mean calibrated PD | Approval rate | TPR | FPR |",
               "|---|---|---|---|---|---|---|"]
         for r in m["fairness"][key]:
