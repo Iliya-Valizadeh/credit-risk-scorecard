@@ -28,3 +28,12 @@ def test_splits_do_not_share_applicants(applicants):
     ids = [set(x["SK_ID_CURR"]) for x in (a, b, c)]
     assert not (ids[0] & ids[1]) and not (ids[0] & ids[2]) and not (ids[1] & ids[2])
     assert sum(len(i) for i in ids) == len(applicants)
+
+
+def test_gender_is_not_a_model_input_but_stays_for_the_group_check(applicants):
+    (X_tr, _), _, _ = M.split(applicants)
+    assert "CODE_GENDER" in X_tr.columns                     # still in the data
+    names = F.build_preprocessor(X_tr).fit(X_tr).get_feature_names_out()
+    assert not any("CODE_GENDER" in n for n in names)        # but not in the model
+    with_gender = F.build_preprocessor(X_tr, exclude=()).fit(X_tr).get_feature_names_out()
+    assert any("CODE_GENDER" in n for n in with_gender)
