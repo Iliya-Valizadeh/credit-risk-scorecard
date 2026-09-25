@@ -18,8 +18,18 @@ lint:
 test:
 	$(RUN) pytest
 
+DATA := data/application_train.csv
+
+# The real evaluation needs the Kaggle data (ADR 0001, decision 5). Every script here
+# writes a committed file under reports/: model, then gender_check, then logreg_check.
 eval:
-	$(RUN) python -m $(PKG).evaluate
+	@if [ ! -f "$(DATA)" ]; then \
+		echo "Missing $(DATA). See data/README.md for how to download it."; \
+		exit 1; \
+	fi
+	$(RUN) python -m $(PKG).model
+	$(RUN) python -m $(PKG).gender_check
+	$(RUN) python -m $(PKG).logreg_check
 
 demo:
 	$(RUN) python -m $(PKG).demo
