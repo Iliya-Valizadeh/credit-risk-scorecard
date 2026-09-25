@@ -30,7 +30,7 @@ from .expected_loss import expected_loss_table
 
 MODELS_DIR = ROOT / "models"
 REPORTS_DIR = ROOT / "reports"
-THRESHOLD = 0.40          # illustrative operating point on the raw LightGBM score
+FLAG_RATE = 0.20          # illustrative policy: decline the riskiest 20% of applicants
 DOWNSTREAM_CALIBRATOR = "isotonic"   # chosen before looking at test results; see README
 
 
@@ -157,13 +157,20 @@ def run(df: pd.DataFrame, sample: int | None = None, n_boot: int = 1000,
                                       "mean_pd": float(np.mean(p_lr))}
     pd_down = calibrated[DOWNSTREAM_CALIBRATOR]
 
+    # The operating threshold is set on the calibration split, so the test split is not
+    # used to choose it: the raw score above which FLAG_RATE of applicants fall.
+    threshold = float(np.quantile(p_gb_cal, 1 - FLAG_RATE))
+    op = E.threshold_table(y_te, p_gb, thresholds=(threshold,)).iloc[0]
+    m["operating_point"] = {"target_flag_rate": FLAG_RATE, "threshold": threshold,
+                            "precision": float(op["precision"]), "recall": float(op["recall"]),
+                            "flag_rate_test": float(op["flag_rate"])}
     m["threshold_table"] = E.threshold_table(y_te, p_gb).to_dict(orient="records")
-    m["expected_loss"] = expected_loss_table(y_te, X_te["AMT_CREDIT"], p_gb, pd_down, THRESHOLD)
+    m["expected_loss"] = expected_loss_table(y_te, X_te["AMT_CREDIT"], p_gb, pd_down, threshold)
 
-    gender = fairness.group_table(X_te["CODE_GENDER"], y_te, p_gb, pd_down, THRESHOLD)
+    gender = fairness.group_table(X_te["CODE_GENDER"], y_te, p_gb, pd_down, threshold)
     age = fairness.group_table(fairness.age_band(X_te["DAYS_BIRTH"]), y_te, p_gb, pd_down,
-                               THRESHOLD)
-    m["fairness"] = {"threshold": THRESHOLD,
+                               threshold)
+    m["fairness"] = {"threshold": threshold,
                      "gender": gender.to_dict(orient="records"),
                      "age_band": age.to_dict(orient="records"),
                      "gender_rows_below_min_n": int((~X_te["CODE_GENDER"].isin(
@@ -182,7 +189,7 @@ def run(df: pd.DataFrame, sample: int | None = None, n_boot: int = 1000,
 
     m["runtime_seconds"] = round(time.time() - t0, 1)
     if save:
-        save_artifacts(pre, lgbm, fitted[DOWNSTREAM_CALIBRATOR], X_tr, THRESHOLD)
+        save_artifacts(pre, lgbm, fitted[DOWNSTREAM_CALIBRATOR], X_tr, threshold)
     return m
 
 
@@ -227,14 +234,20 @@ def results_markdown(m: dict) -> str:
     for r in m["threshold_table"]:
         L.append(f"| {r['threshold']:.2f} | {r['precision']:.3f} | {r['recall']:.3f} | "
                  f"{r['flag_rate']:.3f} |")
+    op = m["operating_point"]
+    L += ["", "## Operating point", "",
+          f"Policy: decline the riskiest {op['target_flag_rate']:.0%}. The raw-score threshold "
+          f"that does this on the calibration split is {op['threshold']:.3f}. On test it flags "
+          f"{op['flag_rate_test']:.1%} of applicants, catches {op['recall']:.1%} of defaulters "
+          f"(recall), and {op['precision']:.1%} of those flagged did default (precision)."]
     el = m["expected_loss"]
-    L += ["", f"## Expected loss at threshold {el['threshold']:.2f} (ILLUSTRATIVE)", "",
+    L += ["", f"## Expected loss at threshold {el['threshold']:.3f} (ILLUSTRATIVE)", "",
           f"LGD {el['lgd']:.0%}, EAD = AMT_CREDIT. Approved share {el['approved_share']:.1%}.", "",
           "| Source | Loss on approved loans |", "|---|---|",
           f"| Raw PDs | {el['el_raw_pd']:,.0f} |",
           f"| Isotonic-calibrated PDs | {el['el_calibrated_pd']:,.0f} |",
           f"| Implied by observed outcomes | {el['loss_implied_by_outcomes']:,.0f} |", "",
-          f"## Group check at threshold {m['fairness']['threshold']:.2f}", ""]
+          f"## Group check at threshold {m['fairness']['threshold']:.3f}", ""]
     for key, title in [("gender", "CODE_GENDER"), ("age_band", "Age band")]:
         L += [f"**{title}**", "",
               "| Group | n | Observed default rate | Mean calibrated PD | Approval rate | TPR | FPR |",
