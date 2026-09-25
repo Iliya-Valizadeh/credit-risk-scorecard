@@ -6,6 +6,7 @@ the chosen threshold.
 
 Run:  streamlit run app/streamlit_app.py
 """
+
 import sys
 from pathlib import Path
 
@@ -21,13 +22,19 @@ st.title("Credit-Risk Scorecard — scoring demo")
 
 ART = Path(__file__).resolve().parents[1] / "models" / "pipeline.joblib"
 if not ART.exists():
-    st.warning("No trained model found. Run `python -m credit_risk_scorecard.model` first to "
-               "create models/pipeline.joblib.")
+    st.warning(
+        "No trained model found. Run `python -m credit_risk_scorecard.model` first to "
+        "create models/pipeline.joblib."
+    )
     st.stop()
 
 art = joblib.load(ART)
 pre, model, calibrator, template, threshold = (
-    art["preprocessor"], art["model"], art["calibrator"], art["template"], art["threshold"]
+    art["preprocessor"],
+    art["model"],
+    art["calibrator"],
+    art["template"],
+    art["threshold"],
 )
 
 st.caption("Enter a few fields; the rest default to a typical applicant.")
@@ -41,21 +48,28 @@ with c2:
     annuity = st.number_input("Annuity (AMT_ANNUITY)", 5000, 300000, 27000, 1000)
     age = st.slider("Age", 21, 70, 40)
 
-st.caption(f"Decline rule: raw model score of {threshold:.3f} or above, which declines the "
-           "riskiest 20% of applicants in the calibration split. The PD shown is the "
-           "isotonic-calibrated one.")
+st.caption(
+    f"Decline rule: raw model score of {threshold:.3f} or above, which declines the "
+    "riskiest 20% of applicants in the calibration split. The PD shown is the "
+    "isotonic-calibrated one."
+)
 
 if st.button("Score applicant"):
     row = dict(template)
-    row.update({
-        "EXT_SOURCE_2": ext2, "EXT_SOURCE_3": ext3,
-        "AMT_INCOME_TOTAL": income, "AMT_CREDIT": credit,
-        "AMT_ANNUITY": annuity, "DAYS_BIRTH": -age * 365,
-    })
+    row.update(
+        {
+            "EXT_SOURCE_2": ext2,
+            "EXT_SOURCE_3": ext3,
+            "AMT_INCOME_TOTAL": income,
+            "AMT_CREDIT": credit,
+            "AMT_ANNUITY": annuity,
+            "DAYS_BIRTH": -age * 365,
+        }
+    )
     X = F.clean(pd.DataFrame([row]))
     score = float(model.predict_proba(pre.transform(X))[:, 1][0])
     pd_cal = float(calibrator.predict([score])[0])
-    st.metric("Probability of default (calibrated)", f"{pd_cal*100:.1f}%")
+    st.metric("Probability of default (calibrated)", f"{pd_cal * 100:.1f}%")
     st.caption(f"Raw model score: {score:.3f}")
     if score >= threshold:
         st.error(f"DECLINE: score {score:.3f} is at or above {threshold:.3f}")
