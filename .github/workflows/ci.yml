@@ -4,16 +4,42 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.11"
-          cache: pip
-      - run: pip install -r requirements-dev.txt
-      - run: ruff check .
-      # Tests use synthetic applicants, so no Kaggle download is needed.
-      - run: pytest -q
+          enable-cache: true
+
+      - name: Install pinned packages
+        run: uv sync --locked
+
+      - name: Lint and types (ruff, mypy)
+        run: make lint
+
+      - name: Tests (pytest, coverage of src)
+        run: make test
+
+      - name: Docs checks (claims, readability, AI-writing signs, local links, README)
+        run: make check-docs
+
+      - name: Demo runs with no downloads or keys
+        run: make demo
+
+  web-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Web link check (lychee)
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config tools/lychee.toml './**/*.md'
+          fail: true
