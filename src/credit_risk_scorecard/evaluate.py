@@ -1,15 +1,22 @@
 """Evaluation: AUC, PR-AUC, threshold analysis, calibration metrics, bootstrap intervals."""
+
 from __future__ import annotations
+
+import matplotlib
 import numpy as np
 import pandas as pd
-import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-from sklearn.metrics import (  # noqa: E402
-    roc_auc_score, average_precision_score, brier_score_loss,
-    precision_score, recall_score, f1_score,
-)
 from sklearn.calibration import calibration_curve  # noqa: E402
+from sklearn.metrics import (  # noqa: E402
+    average_precision_score,
+    brier_score_loss,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
 
 
 def headline(y_true, proba) -> dict:
@@ -28,13 +35,15 @@ def threshold_table(y_true, proba, thresholds=(0.3, 0.4, 0.5, 0.6, 0.7)) -> pd.D
     rows = []
     for t in thresholds:
         pred = (proba >= t).astype(int)
-        rows.append({
-            "threshold": t,
-            "precision": precision_score(y_true, pred, zero_division=0),
-            "recall": recall_score(y_true, pred, zero_division=0),
-            "f1": f1_score(y_true, pred, zero_division=0),
-            "flag_rate": pred.mean(),
-        })
+        rows.append(
+            {
+                "threshold": t,
+                "precision": precision_score(y_true, pred, zero_division=0),
+                "recall": recall_score(y_true, pred, zero_division=0),
+                "f1": f1_score(y_true, pred, zero_division=0),
+                "flag_rate": pred.mean(),
+            }
+        )
     return pd.DataFrame(rows).round(4)
 
 
@@ -61,8 +70,14 @@ def ece(y_true, proba, n_bins=10) -> float:
     return float(total / len(proba))
 
 
-def bootstrap_ci(y_true, scores: dict, metric=roc_auc_score, n_boot=1000, seed=42,
-                 diff: tuple[str, str] | None = None) -> dict:
+def bootstrap_ci(
+    y_true,
+    scores: dict,
+    metric=roc_auc_score,
+    n_boot=1000,
+    seed=42,
+    diff: tuple[str, str] | None = None,
+) -> dict:
     """95% percentile intervals from resampling the test rows with replacement.
 
     `scores` maps a model name to its scores on the same rows. Every model is scored on
@@ -72,7 +87,7 @@ def bootstrap_ci(y_true, scores: dict, metric=roc_auc_score, n_boot=1000, seed=4
     y_true = np.asarray(y_true)
     rng = np.random.default_rng(seed)
     n = len(y_true)
-    draws = {name: [] for name in scores}
+    draws: dict[str, list[float]] = {name: [] for name in scores}
     if diff:
         draws["diff"] = []
     for _ in range(n_boot):
@@ -101,9 +116,12 @@ def plot_calibration(y_true, probas: dict, path=None, n_bins=10):
         top = max(top, mean_pred.max(), frac_pos.max())
     top = min(1.0, top * 1.08)
     ax.plot([0, top], [0, top], "--", color="grey", label="perfect")
-    ax.set_xlim(0, top); ax.set_ylim(0, top)
-    ax.set_xlabel("Mean predicted PD (decile)"); ax.set_ylabel("Observed default rate")
-    ax.set_title("Calibration on the test split"); ax.legend()
+    ax.set_xlim(0, top)
+    ax.set_ylim(0, top)
+    ax.set_xlabel("Mean predicted PD (decile)")
+    ax.set_ylabel("Observed default rate")
+    ax.set_title("Calibration on the test split")
+    ax.legend()
     if path:
         fig.savefig(path, bbox_inches="tight", dpi=120)
         plt.close(fig)
