@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from src import evaluate as E
-from src.calibrate import CALIBRATORS
-from src.expected_loss import expected_loss_table
+from credit_risk_scorecard import evaluate as E
+from credit_risk_scorecard.calibrate import CALIBRATORS
+from credit_risk_scorecard.expected_loss import expected_loss_table
 
 
 @pytest.fixture

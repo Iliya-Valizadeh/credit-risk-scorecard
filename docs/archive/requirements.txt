@@ -1,0 +1,14 @@
+# Versions used for the results in reports/ (Python 3.11).
+pandas==3.0.6
+numpy==2.4.6
+scikit-learn==1.9.1
+lightgbm==4.7.0
+shap==0.51.0
+matplotlib==3.11.2
+seaborn==0.13.2
+joblib==1.6.0
+python-dotenv==1.2.3
+# Optional: PostgreSQL loading (src/data_load.py, --from-db) and the demo app
+SQLAlchemy==2.1.0
+psycopg2-binary==2.9.13
+streamlit==1.64.0
