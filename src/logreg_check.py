@@ -36,10 +36,13 @@ def old_preprocessor(X):
 def fit_and_score(pre, clf, X_tr, y_tr, X_te, y_te):
     t0 = time.time()
     Xtr = pre.fit_transform(X_tr)
+    if not hasattr(Xtr, "toarray"):   # dense: match the float32 matrix src/model.py trains on
+        Xtr = Xtr.astype("float32")
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always", ConvergenceWarning)
         clf.fit(Xtr, y_tr)
-    p = clf.predict_proba(pre.transform(X_te))[:, 1]
+    Xte = pre.transform(X_te)
+    p = clf.predict_proba(Xte if hasattr(Xte, "toarray") else Xte.astype("float32"))[:, 1]
     return {"n_iter": int(clf.n_iter_[0]), "max_iter": clf.max_iter,
             "convergence_warning": any(issubclass(x.category, ConvergenceWarning) for x in w),
             "roc_auc": roc_auc_score(y_te, p), "pr_auc": average_precision_score(y_te, p),
