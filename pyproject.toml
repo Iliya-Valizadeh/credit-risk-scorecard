@@ -59,7 +59,9 @@ addopts = "-q --cov=credit_risk_scorecard --cov-report=term-missing --cov-fail-u
 line-length = 100
 target-version = "py311"
 # tools/ is copied from ds-project-standard and checked there. `copier update` replaces it.
-extend-exclude = ["tools"]
+# notebooks/ is not re-run (ADR 0001, decision 2), so its saved cell outputs must stay as
+# they are; linting or formatting it would mean re-touching cells that are not re-executed.
+extend-exclude = ["tools", "notebooks"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]

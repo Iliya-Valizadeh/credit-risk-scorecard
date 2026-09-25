@@ -12,7 +12,9 @@ assumptions, not estimates:
   - EAD is the full credit amount (AMT_CREDIT), ignoring any repayment before default.
   - TARGET means "had payment difficulties", which is broader than default.
 """
+
 from __future__ import annotations
+
 import numpy as np
 
 LGD = 0.45
@@ -34,6 +36,8 @@ def expected_loss_table(y_true, ead, raw_pd, calibrated_pd, threshold, lgd=LGD) 
         "approved_share": float(approved.mean()),
         "approved_exposure": float(ead[approved].sum()),
         "el_raw_pd": float((np.asarray(raw_pd)[approved] * lgd * ead[approved]).sum()),
-        "el_calibrated_pd": float((np.asarray(calibrated_pd)[approved] * lgd * ead[approved]).sum()),
+        "el_calibrated_pd": float(
+            (np.asarray(calibrated_pd)[approved] * lgd * ead[approved]).sum()
+        ),
         "loss_implied_by_outcomes": realised,
     }
