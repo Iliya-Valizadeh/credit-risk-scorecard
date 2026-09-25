@@ -2,8 +2,8 @@
 import re
 from pathlib import Path
 
-from src import features as F
-from src import model as M
+from credit_risk_scorecard import features as F
+from credit_risk_scorecard import model as M
 
 SQL = Path(__file__).resolve().parents[1] / "sql" / "features.sql"
 

@@ -1,5 +1,5 @@
 """End-to-end run on synthetic data: every section of the report gets filled."""
-from src import model as M
+from credit_risk_scorecard import model as M
 
 
 def test_run_end_to_end(applicants):

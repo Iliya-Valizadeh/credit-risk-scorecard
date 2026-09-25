@@ -14,15 +14,15 @@ import pandas as pd
 import streamlit as st
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-from src import features as F  # noqa: E402
+from credit_risk_scorecard import features as F  # noqa: E402
 
 st.set_page_config(page_title="Credit-Risk Scorecard", page_icon=":bar_chart:")
 st.title("Credit-Risk Scorecard — scoring demo")
 
 ART = Path(__file__).resolve().parents[1] / "models" / "pipeline.joblib"
 if not ART.exists():
-    st.warning("No trained model found. Run `python -m src.model` first to create "
-               "models/pipeline.joblib.")
+    st.warning("No trained model found. Run `python -m credit_risk_scorecard.model` first to "
+               "create models/pipeline.joblib.")
     st.stop()
 
 art = joblib.load(ART)

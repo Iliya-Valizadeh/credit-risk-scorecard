@@ -1,6 +1,6 @@
 """W1: load raw Home Credit CSVs into PostgreSQL.
 
-Run:  python -m src.data_load
+Run:  python -m credit_risk_scorecard.data_load
 """
 import pandas as pd
 from sqlalchemy import create_engine
