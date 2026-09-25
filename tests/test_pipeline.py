@@ -13,5 +13,6 @@ def test_run_end_to_end(applicants):
     assert abs(m["calibration"]["isotonic"]["mean_pd"] - obs) < abs(
         m["calibration"]["raw"]["mean_pd"] - obs)
     assert {r["group"] for r in m["fairness"]["gender"]} == {"F", "M"}
+    assert m["data"]["excluded_from_model"] == ["CODE_GENDER"]
     md = M.results_markdown(m)
     assert "## Calibration" in md and "ILLUSTRATIVE" in md
