@@ -19,9 +19,9 @@ import pandas as pd
 
 
 def age_band(days_birth: pd.Series) -> pd.Series:
-    years = -days_birth / 365.25
+    years = -days_birth / 365.25       # the youngest applicant in the data is 20
     return pd.cut(years, bins=[0, 30, 45, 60, 200], right=False,
-                  labels=["18-29", "30-44", "45-59", "60+"]).astype(str)
+                  labels=["20-29", "30-44", "45-59", "60+"]).astype(str)
 
 
 def group_table(groups, y_true, raw_score, calibrated_pd, threshold, min_n=100) -> pd.DataFrame:

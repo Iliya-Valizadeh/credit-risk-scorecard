@@ -64,7 +64,7 @@ LGD 45%, EAD = AMT_CREDIT. Approved share 80.3%.
 
 | Group | n | Observed default rate | Mean calibrated PD | Approval rate | TPR | FPR |
 |---|---|---|---|---|---|---|
-| 18-29 | 8,975 | 0.115 | 0.116 | 0.646 | 0.675 | 0.312 |
+| 20-29 | 8,975 | 0.115 | 0.116 | 0.646 | 0.675 | 0.312 |
 | 30-44 | 24,664 | 0.090 | 0.088 | 0.774 | 0.581 | 0.191 |
 | 45-59 | 20,778 | 0.066 | 0.066 | 0.858 | 0.437 | 0.120 |
 | 60+ | 7,086 | 0.048 | 0.047 | 0.941 | 0.238 | 0.050 |
@@ -82,4 +82,4 @@ LGD 45%, EAD = AMT_CREDIT. Approved share 80.3%.
 9. `NAME_EDUCATION_TYPE_Higher education` (0.075)
 10. `DAYS_BIRTH` (0.067)
 
-Run time: 155.1 s.
+Run time: 151.5 s.
