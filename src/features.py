@@ -38,7 +38,8 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
 def split_columns(X: pd.DataFrame) -> tuple[list[str], list[str]]:
     """Return (numeric_cols, categorical_cols), excluding the id column."""
     numeric = [c for c in X.select_dtypes(include=[np.number]).columns if c != ID_COL]
-    categorical = [c for c in X.select_dtypes(include=["object", "category"]).columns]
+    # Everything that is not numeric. Works for object and pandas 3 "str" columns alike.
+    categorical = [c for c in X.columns if c not in numeric and c != ID_COL]
     return numeric, categorical
 
 
