@@ -1,4 +1,5 @@
 """End-to-end run on synthetic data: every section of the report gets filled."""
+
 from credit_risk_scorecard import model as M
 
 
@@ -11,7 +12,8 @@ def test_run_end_to_end(applicants):
     # Calibrating on held-out data should bring the mean PD close to the observed rate.
     obs = m["calibration"]["observed_default_rate_test"]
     assert abs(m["calibration"]["isotonic"]["mean_pd"] - obs) < abs(
-        m["calibration"]["raw"]["mean_pd"] - obs)
+        m["calibration"]["raw"]["mean_pd"] - obs
+    )
     assert {r["group"] for r in m["fairness"]["gender"]} == {"F", "M"}
     assert m["data"]["excluded_from_model"] == ["CODE_GENDER"]
     md = M.results_markdown(m)
