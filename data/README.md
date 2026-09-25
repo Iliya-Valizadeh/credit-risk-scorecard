@@ -13,8 +13,8 @@ Raw data is **not** committed to this repo. Download it locally.
 
 Or via the Kaggle CLI:
 
-\`\`\`bash
+```bash
 pip install kaggle
 kaggle competitions download -c home-credit-default-risk -p data/
 cd data && unzip home-credit-default-risk.zip
-\`\`\`
+```

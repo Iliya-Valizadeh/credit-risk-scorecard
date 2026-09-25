@@ -17,6 +17,9 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 DAYS_EMPLOYED_SENTINEL = 365243
 ID_COL = "SK_ID_CURR"
 TARGET = "TARGET"
+# Kept in the data for the group check in src/fairness.py, but never given to the model.
+# Canadian human rights law bars discrimination on sex in services, credit included.
+NOT_MODEL_INPUTS = ("CODE_GENDER",)
 
 
 def clean(df: pd.DataFrame) -> pd.DataFrame:
@@ -35,25 +38,36 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def split_columns(X: pd.DataFrame) -> tuple[list[str], list[str]]:
-    """Return (numeric_cols, categorical_cols), excluding the id column."""
-    numeric = [c for c in X.select_dtypes(include=[np.number]).columns if c != ID_COL]
-    categorical = [c for c in X.select_dtypes(include=["object", "category"]).columns]
+def split_columns(X: pd.DataFrame, exclude=NOT_MODEL_INPUTS) -> tuple[list[str], list[str]]:
+    """Return (numeric_cols, categorical_cols) for the model: no id column, and none of
+    the columns in `exclude`."""
+    skip = {ID_COL, *exclude}
+    numeric = [c for c in X.select_dtypes(include=[np.number]).columns if c not in skip]
+    # Everything that is not numeric. Works for object and pandas 3 "str" columns alike.
+    categorical = [c for c in X.columns if c not in numeric and c not in skip]
     return numeric, categorical
 
 
-def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
-    """Impute + scale numerics, impute + one-hot categoricals. Sparse-friendly."""
-    numeric, categorical = split_columns(X)
+def build_preprocessor(X: pd.DataFrame, exclude=NOT_MODEL_INPUTS) -> ColumnTransformer:
+    """Impute + standardise numerics, impute + one-hot categoricals. Dense output.
+
+    The first version used StandardScaler(with_mean=False) to keep the matrix sparse.
+    That divides by the standard deviation but does not centre. Together with the saga
+    solver, the logistic regression hit its iteration cap. Centring plus lbfgs converges.
+    src/logreg_check.py compares the setups; ROC-AUC barely moves.
+    Centring needs a dense matrix, which fits in memory at this size.
+    Columns not listed here (the id and anything in `exclude`) are dropped.
+    """
+    numeric, categorical = split_columns(X, exclude)
     numeric_pipe = Pipeline([
         ("impute", SimpleImputer(strategy="median")),
-        ("scale", StandardScaler(with_mean=False)),  # keep sparse-compatible
+        ("scale", StandardScaler()),
     ])
     categorical_pipe = Pipeline([
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
     ])
     return ColumnTransformer([
         ("num", numeric_pipe, numeric),
         ("cat", categorical_pipe, categorical),
-    ])
+    ], sparse_threshold=0.0)
