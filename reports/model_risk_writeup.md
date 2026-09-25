@@ -1,55 +1,67 @@
-# Model-Risk Write-up — Credit-Risk Scorecard
+# Model-risk write-up: credit-risk scorecard
 
-*One-page note in the terms a bank's model-risk function uses. Numbers in [brackets] are
-filled from an actual training run — none are asserted before they are measured.*
+*A one-page note in the terms a bank's model-risk team uses. Every number is from
+`python -m src.model` and is recorded in [results.md](results.md).*
 
 ## 1. Purpose and use
 The model estimates an applicant's probability of default (PD) on a consumer credit
-product, to support an approve/decline decision at a chosen threshold. It is a
-decision-support scorecard, **not** an automated final adjudication, and must not be used
-for pricing or collections without separate validation.
+product, to support an approve/decline decision at a chosen threshold. It is decision
+support, **not** automated final adjudication. It must not be used for pricing or
+collections without separate validation.
 
 ## 2. Data and representativeness
-Trained on the Home Credit Default Risk application data (a 17,000-row sample of the ~307k applicants, all application-level fields). Target prevalence is 7.85% default — a ~1:12 class imbalance, which
-drives every downstream choice below. Known data-quality issue handled explicitly:
-`DAYS_EMPLOYED` carries a sentinel value (365243) for the not-employed population
-(present in the full data; recoded wherever it appears), recoded to missing rather than treated as a real duration. Limitation:
-the data is a single-snapshot public dataset, so temporal drift and this population's
-match to any specific lender's book are untested.
+Trained on the Home Credit Default Risk application data: all 307,511 applicants, split
+60/20/20 into train, calibration and test. 8.07% of applicants have the target (payment
+difficulties), a class imbalance of about 1:11 that drives the choices below. A known
+data-quality issue is handled explicitly: `DAYS_EMPLOYED` holds a sentinel value (365243)
+for applicants not in employment, and it is recoded to missing rather than read as a
+1,000-year job. Limitation: this is a single-snapshot public dataset with a random split.
+Drift over time, and how well this population matches any specific lender's book, are
+untested.
 
 ## 3. Performance
-Because defaults are rare, accuracy is meaningless (predicting "no default" for everyone
-scores ~92%). The model is judged on ranking and on behaviour at the operating point:
+Defaults are rare, so accuracy is meaningless: predicting "no default" for everyone
+scores about 92%. The model is judged on ranking and on its behaviour at the operating
+point.
 
-| Model | ROC-AUC | PR-AUC |
-|-------|---------|--------|
-| Logistic regression (baseline) | 0.734 | 0.197 |
-| LightGBM | 0.736 | 0.212 |
+| Model | ROC-AUC (95% CI) | PR-AUC (95% CI) |
+|---|---|---|
+| Logistic regression | 0.755 (0.748 to 0.761) | 0.229 (0.219 to 0.240) |
+| LightGBM | 0.770 (0.764 to 0.777) | 0.256 (0.244 to 0.268) |
 
-The logistic baseline exists as an interpretable reference; the boosted model is the
-candidate. At an illustrative 0.40 threshold, the model flags ~23% of applicants and catches ~51% of
-true defaulters (recall) at ~18% precision.
+The logistic regression is the interpretable reference. The boosted model is the
+candidate, and its advantage holds on a paired bootstrap (ROC-AUC gap 0.012 to 0.019).
+The illustrative policy declines the riskiest 20%: it catches 53.7% of defaulters at
+22.0% precision.
 
 ## 4. Calibration
-A bank does not just need the *ranking* of applicants — it needs the PD to mean what it
-says, because predicted PD feeds expected-loss provisioning and risk-based pricing. A
-model can rank well yet be poorly calibrated. We therefore report a reliability curve
-(`reports/figures/calibration.png`): predicted PD deciles versus observed default rate.
-Deviation from the diagonal indicates where PDs are over- or under-stated and where a
-post-hoc calibration step (e.g. isotonic/Platt) would be required before the scores drive
-financial math.
+A bank needs more than the ranking. The PD has to mean what it says, because it feeds
+expected-loss provisioning and risk-based pricing. The class weighting used in training
+(`scale_pos_weight`) inflates every PD: the raw mean PD is 0.394 against an observed
+rate of 0.081. Isotonic regression fitted on the calibration split brings the mean PD to
+0.080, the Brier score from 0.185 to 0.067, and the expected calibration error from
+0.313 to 0.003, with the ranking unchanged. Under an assumed 45% LGD, the loss implied
+by raw PDs on approved loans is almost 7 times the loss implied by actual outcomes.
+Calibrated PDs come within 3%.
 
 ## 5. Explainability
-Two obligations: explain the model globally, and explain any individual decline
-(adverse-action / regulatory requirement). Global drivers come from SHAP
-(`reports/figures/shap_summary.png`); consistent with EDA, the external credit scores
-`EXT_SOURCE_2/3` are expected to dominate, alongside the engineered credit-to-income
-ratios. Local explanations (per-applicant SHAP) let an adjudicator state the specific
-reasons a given application scored as it did.
+Two obligations: explain the model globally, and explain any individual decline (adverse
+action). Globally, SHAP ranks the three external credit scores first (`EXT_SOURCE_3`,
+`EXT_SOURCE_2`, `EXT_SOURCE_1`), followed by the engineered annuity-to-credit ratio
+(`reports/figures/shap_summary.png`). Per-applicant SHAP values would let an adjudicator
+state the reasons a given application scored as it did. That isn't built into the demo
+app yet.
 
-## 6. Limitations and monitoring
-The model should not be trusted outside the population it was trained on; it has no
-fairness audit across protected attributes (a required step before any real deployment);
-and it assumes a stationary relationship between features and default. In production it
-would need PD-calibration monitoring, population-stability (PSI) checks on inputs, and a
-retrain trigger when either drifts beyond tolerance.
+## 6. Fairness
+Calibration holds within gender and age groups, but error rates don't match. Non-defaulting
+men are declined at 23.9% vs 13.1% for non-defaulting women, and the gap by age is wider.
+Gender is a direct input and ranks 8th by SHAP. Before any real use, this needs a fairness
+and legal review, and the gender input would very likely have to go, with a check for
+proxies afterwards.
+
+## 7. Limitations and monitoring
+The model shouldn't be trusted outside the population it was trained on. It assumes a
+stable relationship between features and default, and it has had no out-of-time test.
+In production it would need PD-calibration monitoring, population-stability (PSI)
+checks on inputs, group error-rate monitoring, and a retrain trigger when any of them
+drifts past tolerance. [MODEL_CARD.md](../MODEL_CARD.md) sets out proposed thresholds.
