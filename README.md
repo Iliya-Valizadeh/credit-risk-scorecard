@@ -93,7 +93,7 @@ any real lending decision without full-data retraining and independent validatio
 
 ## Repo structure
 
-\`\`\`
+```
 credit-risk-scorecard/
 ├── README.md
 ├── requirements.txt
@@ -118,17 +118,20 @@ credit-risk-scorecard/
 └── reports/
     ├── model_risk_writeup.md
     └── figures/
-\`\`\`
+```
 
 ## Setup
 
-\`\`\`bash
+```bash
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env        # then fill in your PostgreSQL credentials
-\`\`\`
+```
 
 Then follow [`data/README.md`](data/README.md) to download the dataset, and run:
 
-\`\`\`bash
-python -m src.data_load
+```bash
+python -m src.data_load        # optional: load the CSVs into PostgreSQL
+python -m src.model            # train both models and print the metrics
+streamlit run app/streamlit_app.py
+```
