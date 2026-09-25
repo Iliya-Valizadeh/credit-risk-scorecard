@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from src import features as F
+from credit_risk_scorecard import features as F
 
 
 def test_days_employed_sentinel_becomes_missing():
