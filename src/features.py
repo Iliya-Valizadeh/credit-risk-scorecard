@@ -43,17 +43,23 @@ def split_columns(X: pd.DataFrame) -> tuple[list[str], list[str]]:
 
 
 def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
-    """Impute + scale numerics, impute + one-hot categoricals. Sparse-friendly."""
+    """Impute + standardise numerics, impute + one-hot categoricals. Dense output.
+
+    The first version used StandardScaler(with_mean=False) to keep the matrix sparse.
+    That divides by the standard deviation but does not centre, so columns like
+    AMT_CREDIT and DAYS_BIRTH kept large offsets and the logistic regression hit its
+    iteration cap. Centring needs a dense matrix, which fits in memory at this size.
+    """
     numeric, categorical = split_columns(X)
     numeric_pipe = Pipeline([
         ("impute", SimpleImputer(strategy="median")),
-        ("scale", StandardScaler(with_mean=False)),  # keep sparse-compatible
+        ("scale", StandardScaler()),
     ])
     categorical_pipe = Pipeline([
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
     ])
     return ColumnTransformer([
         ("num", numeric_pipe, numeric),
         ("cat", categorical_pipe, categorical),
-    ])
+    ], sparse_threshold=0.0)
