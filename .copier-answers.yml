@@ -1,0 +1,13 @@
+# Written by Copier. Do not edit by hand; `copier update` reads it.
+_commit: v1.0
+_src_path: gh:Iliya-Valizadeh/ds-project-standard
+author_name: Iliya Valizadeh
+copyright_year: 2026
+github_user: Iliya-Valizadeh
+has_dataset: false
+has_model: true
+one_line: 'A credit default model on the public Home Credit Default Risk data: a logistic
+    regression baseline and a LightGBM model, trained on all 307,511 applications.'
+package_name: credit_risk_scorecard
+project_name: credit-risk-scorecard
+python_version: '3.11'
