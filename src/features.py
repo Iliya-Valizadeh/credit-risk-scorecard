@@ -47,9 +47,10 @@ def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
     """Impute + standardise numerics, impute + one-hot categoricals. Dense output.
 
     The first version used StandardScaler(with_mean=False) to keep the matrix sparse.
-    That divides by the standard deviation but does not centre, so columns like
-    AMT_CREDIT and DAYS_BIRTH kept large offsets and the logistic regression hit its
-    iteration cap. Centring needs a dense matrix, which fits in memory at this size.
+    That divides by the standard deviation but does not centre. Together with the saga
+    solver, the logistic regression hit its iteration cap. Centring plus lbfgs converges;
+    src/logreg_check.py shows which part mattered and that ROC-AUC barely moves.
+    Centring needs a dense matrix, which fits in memory at this size.
     """
     numeric, categorical = split_columns(X)
     numeric_pipe = Pipeline([
