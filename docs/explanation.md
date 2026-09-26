@@ -16,14 +16,14 @@ at the time.
 
 ## Why class weighting, and why that needs calibration
 
-Only 8.07% of applicants in this data have the target. A model trained on that mix
-with no adjustment would learn to predict "no default" almost every time and still
-score well on plain accuracy. `scale_pos_weight` in LightGBM, and class weighting in
-logistic regression, counteract that by making each defaulter count for more during
-training. The trade-off is that the raw score then overstates every applicant's risk;
-the [calibration](glossary.md#calibration) step in this project's method exists only to
-undo that side effect, using data the models never trained on, so the fix isn't
-trained on the same rows it is judged on.
+Only 8.07% of applicants in this data have the target. `scale_pos_weight` in
+LightGBM, and class weighting in logistic regression, make each defaulter count for
+more during training. This is a common way to handle a rare target. This project never
+trained a model without it, so it can't say how much, if at all, the weighting helped
+the ranking. What is certain is the cost: the raw score overstates every applicant's
+risk. The [calibration](glossary.md#calibration) step exists only to undo that side
+effect. It uses data the models never trained on, so the fix isn't fitted on the same
+rows it is judged on.
 
 ## Why isotonic regression over Platt scaling
 

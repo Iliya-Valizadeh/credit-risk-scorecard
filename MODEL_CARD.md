@@ -27,7 +27,8 @@ decision support, a person would make the final decision.
 The group check covers gender (`CODE_GENDER`, women and men) and age in four bands (20
 to 29, 30 to 44, 45 to 59, 60 and over), <!-- not-a-claim -->
 because these are the groups the data
-supports and the ones a Canadian lender would need to check for disparate impact.
+supports. Sex and age are also both prohibited grounds of discrimination under the
+Canadian Human Rights Act, so a Canadian lender would likely check them.
 Gender is not a model input; it stays in the data only for this check. Age is an input,
 through `DAYS_BIRTH`.
 
@@ -93,7 +94,8 @@ are the important inputs most correlated with it. Calibrated PDs are 0.4 points 
 the observed rate for women and 1.0 point below it for men. <!-- not-a-claim -->
 
 By age, non-defaulting applicants aged 20 to 29 <!-- not-a-claim --> are declined at
-30.7%, against 4.7% for those 60 and over. Calibration holds within each age band. The README explains what the
+30.7%, against 4.7% for those 60 and over. In each age band, the mean calibrated PD is
+close to the observed default rate. None of these group figures has an interval. The README explains what the
 check does and doesn't show.
 
 ## Ethical considerations

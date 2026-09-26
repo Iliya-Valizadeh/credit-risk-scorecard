@@ -1,16 +1,17 @@
 # Credit-risk scorecard
 
 A LightGBM model that ranks loan applicants by default risk and turns that score into
-a probability a lender can use, tested on 307,511 real applications from Kaggle's Home
+a calibrated probability of default, built on 307,511 applications from Kaggle's Home
 Credit data.
 
 ## In plain words
 
-This project scores loan applicants for the risk that they miss payments. The first
-version of the score was much too high for everyone: it said the average applicant had
-a 40% chance of missing payments, when the real rate is 8%. This project fixes that
-with a second step, and also checks whether declines fall unevenly across gender and
-age.
+This project scores loan applicants for the risk that they miss payments. The raw
+score was much too high for everyone. It said the average applicant had a 40% chance
+of missing payments, when the real rate is 8%. That came from how the model was
+trained: it gave extra weight to the few people who missed payments. A second step
+fixes the score. The project also checks whether declines fall unevenly across gender
+and age.
 
 ## Try it
 
@@ -37,8 +38,9 @@ numbers.
 ![Raw score against calibrated probability, compared with the observed default rate](reports/figures/calibration.png)
 
 The chart shows the raw score badly overstating risk, and the isotonic-calibrated PD
-tracking the true default rate. This is the main fix in this project: the ranking was
-already fine, but the probabilities were not.
+tracking the true default rate. The ranking did not need this step, but the
+probabilities did. The class weighting used in training caused that, so this step mostly undoes
+a side effect of a choice made in this project.
 
 ### Ranking
 
@@ -82,11 +84,15 @@ is the step that makes that true.
 The observed default rate on test is 8.07%. The Brier score is the mean squared gap
 between the PD and the 0/1 outcome. ECE sorts applicants into 10 equal-sized groups by
 PD and averages the gap between predicted and actual default rates. Calibration cuts
-the Brier score by 64% and the ECE by 99%, and the ranking barely changes. <!-- not-a-claim -->
+the Brier score by 64% and the ECE by 99%, and ROC-AUC barely changes. <!-- not-a-claim -->
+PR-AUC does fall, from 0.254 to 0.244, because isotonic regression gives many
+applicants the same PD. Decisions use the raw score, so they are not affected.
 
-Platt and isotonic come out the same here. I chose isotonic before looking at test
-results, because the calibration split is large (61,502 rows), and it is used for
-everything below.
+Platt and isotonic come out the same here. Isotonic is used for everything below. The
+code comment says I chose it before looking at test results, because the calibration
+split is large (61,502 rows). The git history can't confirm that: the choice and the
+first test scoring of calibration came in the same commit
+([ADR 0003](docs/decisions/0003-held-out-calibration-with-isotonic-regression.md)).
 
 ### Operating point
 
@@ -108,7 +114,8 @@ calibration split, not on test. On test it declines 19.5% of applicants and catc
 [Expected loss](docs/glossary.md#expected-loss) = PD x [LGD](docs/glossary.md#lgd) x
 exposure. The data has no recovery amounts, so LGD (loss given default) is set to 45%
 and exposure to the full credit amount. Both are assumed values; neither is estimated
-from the data.
+from the data. The amounts are in the data's own currency, which the dataset does not
+name.
 
 | Summed over approved applicants | Loss |
 |---|---|
@@ -117,8 +124,10 @@ from the data.
 | Implied by what actually happened | 633,364,511 |
 
 With the raw PDs, the expected loss is almost 7 times what the outcomes imply. With
-calibrated PDs it is within 2%. That is what the broken probabilities would cost if
-anyone used the raw scores for provisioning.
+calibrated PDs it is within 2%. That shows how far off provisions would be if anyone
+used the raw scores. The close match for calibrated PDs is expected rather than a
+separate test: the calibrator was fitted to make PDs match default rates on data drawn
+the same way as the test part.
 
 ### Gender
 
@@ -136,6 +145,7 @@ with and without it on the same split and compares the decisions at each model's
 | Without gender | 0.769 | Men | 0.752 | 0.583 | 0.209 |
 
 Dropping the column cost 0.002 of ROC-AUC (0.7703 to 0.7687) and narrowed the gaps. <!-- not-a-claim -->
+These come from one split with no interval, and a change that small may be noise.
 Men were approved 12.2 points less often than women; now it is 7.9 points. <!-- not-a-claim -->
 Among applicants who had no payment difficulties, men were declined 10.8 points more <!-- not-a-claim -->
 often than women; now it is 6.6. <!-- not-a-claim -->
@@ -167,7 +177,8 @@ At the same threshold, without gender:
 Age enters the model directly through `DAYS_BIRTH`. Applicants aged 20 to 29 <!-- not-a-claim -->
 who had no payment difficulties are declined 30.7% of the time, against 4.7% for those
 over 60.
-Calibration holds within every age band. Age is also a prohibited ground of
+In every age band, the mean calibrated PD is close to the observed default rate (see
+the table). Age is also a prohibited ground of
 discrimination under the Canadian Human Rights Act. I've left `DAYS_BIRTH` in and
 reported its effect; whether a lender could use it is a legal question this repo
 doesn't answer.
@@ -236,9 +247,10 @@ The three weaknesses most likely to change the headline result, from
    hasn't measured.
 
 Also worth knowing: there are no SQL features built yet (`sql/features.sql` holds one
-commented example, and the bureau and previous-application tables aren't used), and
-missing values are imputed without a flag saying they were missing, which credit data
-often needs. The full ranked list of 14 weaknesses, including the smaller ones, is in <!-- not-a-claim -->
+commented example, and the bureau and previous-application tables aren't used).
+Earlier versions of this README said there was a SQL feature pipeline. There isn't
+one yet. Missing values are imputed without a flag saying they were missing, which
+credit data often needs. The full ranked list of 16 weaknesses, including the smaller ones, is in <!-- not-a-claim -->
 [docs/whats_weak.md](docs/whats_weak.md). The model shouldn't be used for pricing,
 collections or any real lending decision; see [MODEL_CARD.md](MODEL_CARD.md) and
 [reports/model_risk_writeup.md](reports/model_risk_writeup.md).
