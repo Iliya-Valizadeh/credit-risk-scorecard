@@ -8,7 +8,8 @@ This record was written after the fact, from the git history.
 ## Context
 
 LightGBM is trained with `scale_pos_weight`, so each defaulter counts about as much as
-eleven other applicants. That helps ranking, but it pushes every score up. The README in
+eleven other applicants. It is meant to help ranking on a rare target, but no model
+without it was trained to check that. What it does do is push every score up. The README in
 `3b07ccd` already said the raw scores over-predict default and would need Platt or
 isotonic recalibration before anyone used them as a probability of default (PD).
 
