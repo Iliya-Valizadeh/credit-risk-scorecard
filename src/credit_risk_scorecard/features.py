@@ -6,13 +6,15 @@ Decisions here are driven by the Sprint 1 EDA:
 - Heavy missingness in some building-info columns is left to the imputer (baseline);
   informative-missingness flags are a future improvement.
 """
+
 from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 DAYS_EMPLOYED_SENTINEL = 365243
 ID_COL = "SK_ID_CURR"
@@ -59,15 +61,22 @@ def build_preprocessor(X: pd.DataFrame, exclude=NOT_MODEL_INPUTS) -> ColumnTrans
     Columns not listed here (the id and anything in `exclude`) are dropped.
     """
     numeric, categorical = split_columns(X, exclude)
-    numeric_pipe = Pipeline([
-        ("impute", SimpleImputer(strategy="median")),
-        ("scale", StandardScaler()),
-    ])
-    categorical_pipe = Pipeline([
-        ("impute", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
-    ])
-    return ColumnTransformer([
-        ("num", numeric_pipe, numeric),
-        ("cat", categorical_pipe, categorical),
-    ], sparse_threshold=0.0)
+    numeric_pipe = Pipeline(
+        [
+            ("impute", SimpleImputer(strategy="median")),
+            ("scale", StandardScaler()),
+        ]
+    )
+    categorical_pipe = Pipeline(
+        [
+            ("impute", SimpleImputer(strategy="most_frequent")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+        ]
+    )
+    return ColumnTransformer(
+        [
+            ("num", numeric_pipe, numeric),
+            ("cat", categorical_pipe, categorical),
+        ],
+        sparse_threshold=0.0,
+    )

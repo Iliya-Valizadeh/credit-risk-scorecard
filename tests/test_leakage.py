@@ -1,9 +1,10 @@
 """The target and the row id must never reach the model."""
+
 import re
 from pathlib import Path
 
-from src import features as F
-from src import model as M
+from credit_risk_scorecard import features as F
+from credit_risk_scorecard import model as M
 
 SQL = Path(__file__).resolve().parents[1] / "sql" / "features.sql"
 
@@ -32,8 +33,8 @@ def test_splits_do_not_share_applicants(applicants):
 
 def test_gender_is_not_a_model_input_but_stays_for_the_group_check(applicants):
     (X_tr, _), _, _ = M.split(applicants)
-    assert "CODE_GENDER" in X_tr.columns                     # still in the data
+    assert "CODE_GENDER" in X_tr.columns  # still in the data
     names = F.build_preprocessor(X_tr).fit(X_tr).get_feature_names_out()
-    assert not any("CODE_GENDER" in n for n in names)        # but not in the model
+    assert not any("CODE_GENDER" in n for n in names)  # but not in the model
     with_gender = F.build_preprocessor(X_tr, exclude=()).fit(X_tr).get_feature_names_out()
     assert any("CODE_GENDER" in n for n in with_gender)
