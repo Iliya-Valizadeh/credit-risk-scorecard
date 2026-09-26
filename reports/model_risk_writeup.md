@@ -1,14 +1,14 @@
 # Model-risk write-up: credit-risk scorecard
 
 A one-page note in the terms a bank's model-risk team uses. Every number is from
-`python -m src.model` ([results.md](results.md)) or `python -m src.gender_check`
-([gender_check.md](gender_check.md)).
+`python -m credit_risk_scorecard.model` ([results.md](results.md)) or
+`python -m credit_risk_scorecard.gender_check` ([gender_check.md](gender_check.md)).
 
 ## 1. Purpose and use
 The model estimates an applicant's probability of default (PD) on a consumer credit
-product, to support an approve or decline decision at a chosen threshold. It is decision
-support. A person makes the final decision. It must not be used for pricing or
-collections without separate validation.
+product. It is a portfolio project on public data and is not for real lending, pricing
+or collections. If it were used, it would be decision support for an approve or decline
+decision at a chosen threshold, and a person would make the final decision.
 
 ## 2. Data and representativeness
 The model is trained on the Home Credit Default Risk application data: all 307,511
@@ -41,7 +41,8 @@ every PD: the raw mean PD is 0.395 against an observed rate of 0.081. Isotonic r
 fitted on the calibration split brings the mean PD to 0.080, the Brier score from 0.185
 to 0.067, and the expected calibration error from 0.315 to 0.003. Under an assumed 45%
 LGD, the loss implied by raw PDs on approved loans is almost 7 times the loss implied by
-actual outcomes. With calibrated PDs it is within 2%.
+actual outcomes. With calibrated PDs it is within 2%, which is expected, since the
+calibrator was fitted on data drawn the same way as the test part.
 
 ## 5. Explainability
 The model has to be explained globally, and any individual decline has to be explained
