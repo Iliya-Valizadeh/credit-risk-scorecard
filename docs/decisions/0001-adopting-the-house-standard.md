@@ -72,7 +72,7 @@ covers `app/streamlit_app.py` and the import lines of `notebooks/01_eda.ipynb`. 
 notebook is not re-run, so its saved outputs stay as they are. The `pythonpath` hack
 goes away, because `uv sync` installs the package.
 
-Why: an import rename cannot change a number, and the final metrics diff proves it.
+Why: an import rename cannot change a number, and the final metrics diff will check it.
 The flat layout would cost a small amount forever. The move costs one reviewed commit
 once.
 
@@ -176,7 +176,7 @@ Options:
 Decision: after the layout move, measure coverage of `credit_risk_scorecard`, round it
 down to a whole percent, and set that as `--cov-fail-under`. It is never lowered. Each
 new module added in this phase, such as `demo.py` and `synthetic.py`, must reach 80% on <!-- not-a-claim -->
-its own in the coverage report. A `roadmap` issue tracks raising the whole package to
+its own in the coverage report. A `roadmap` issue will track raising the whole package to
 80%. <!-- not-a-claim -->
 
 ### 9. The eval plan, written after the results
