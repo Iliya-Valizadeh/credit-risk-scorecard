@@ -1,14 +1,73 @@
+[project]
+name = "credit-risk-scorecard"
+version = "0.1.0"
+description = "A credit default model on the public Home Credit Default Risk data: a logistic regression baseline and a LightGBM model, trained on all 307,511 applications."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Iliya Valizadeh" }]
+requires-python = ">=3.11"
+dependencies = [
+    "pandas==3.0.6",
+    "numpy==2.4.6",
+    "scikit-learn==1.9.1",
+    "lightgbm==4.7.0",
+    "shap==0.51.0",
+    "matplotlib==3.11.2",
+    "seaborn==0.13.2",
+    "joblib==1.6.0",
+    "python-dotenv==1.2.3",
+]
+
+[project.optional-dependencies]
+# PostgreSQL loading (credit_risk_scorecard/data_load.py, --from-db). Not needed for
+# results, tests or the demo.
+db = [
+    "SQLAlchemy==2.1.0",
+    "psycopg2-binary==2.9.13",
+]
+# The Streamlit scoring app (app/streamlit_app.py). Not needed for results, tests or
+# the demo.
+app = [
+    "streamlit==1.64.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+    "textstat>=0.7.4",
+]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/credit_risk_scorecard"]
+
 [tool.pytest.ini_options]
-pythonpath = ["."]
 testpaths = ["tests"]
+# 53% is the measured coverage of credit_risk_scorecard after the layout move (ADR 0001,
+# decision 8). It only goes up from here; raising it to the template's 80% is a roadmap
+# issue, since the big pipeline functions need the real data or heavy mocking to cover.
+addopts = "-q --cov=credit_risk_scorecard --cov-report=term-missing --cov-fail-under=53"
 
 [tool.ruff]
 line-length = 100
-extend-exclude = ["notebooks"]
+target-version = "py311"
+# tools/ is copied from ds-project-standard and checked there. `copier update` replaces it.
+# notebooks/ is not re-run (ADR 0001, decision 2), so its saved cell outputs must stay as
+# they are; linting or formatting it would mean re-touching cells that are not re-executed.
+extend-exclude = ["tools", "notebooks"]
 
 [tool.ruff.lint]
-# Pyflakes plus the pycodestyle error rules (ruff's long-standing default set),
-# written out so a newer ruff does not change what CI checks.
-select = ["E4", "E7", "E9", "F"]
-# E702: the plotting code puts short matplotlib calls on one line on purpose.
-ignore = ["E702"]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+check_untyped_defs = true
+ignore_missing_imports = true
+files = ["src", "tests"]

@@ -1,12 +1,13 @@
 """Central config: paths and database connection."""
-from pathlib import Path
+
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data"
 FIGURES_DIR = ROOT / "reports" / "figures"
 

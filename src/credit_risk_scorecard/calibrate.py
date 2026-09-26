@@ -10,7 +10,11 @@ judged on a separate test split.
 - Isotonic regression: a step function that only has to be non-decreasing. More
   flexible, needs more data, and can overfit a small calibration set.
 """
+
 from __future__ import annotations
+
+from typing import Protocol
+
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
@@ -42,4 +46,14 @@ class IsotonicCalibrator:
         return self._iso.predict(np.asarray(raw, dtype=float))
 
 
-CALIBRATORS = {"platt": PlattCalibrator, "isotonic": IsotonicCalibrator}
+class Calibrator(Protocol):
+    """Shared shape of the two calibrators below, for type-checking CALIBRATORS."""
+
+    def fit(self, raw, y) -> Calibrator: ...
+    def predict(self, raw): ...
+
+
+CALIBRATORS: dict[str, type[Calibrator]] = {
+    "platt": PlattCalibrator,
+    "isotonic": IsotonicCalibrator,
+}
