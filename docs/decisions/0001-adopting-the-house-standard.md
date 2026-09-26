@@ -103,7 +103,7 @@ Decision: `make demo` runs `python -m credit_risk_scorecard.demo` on synthetic
 applicants. The generator that `tests/conftest.py` uses today moves into the package as
 `credit_risk_scorecard/synthetic.py`, and the test fixture imports it from there, so
 there is one copy. The demo then calls the same functions the real run uses:
-cleaning and features, the split, logistic regression, LightGBM, calibration and the
+cleaning and features, the split, logistic regression, LightGBM, [calibration](../glossary.md#calibration) and the
 threshold. It prints a short table and scores five synthetic applicants.
 
 Rules for the demo:
@@ -187,7 +187,7 @@ here: the results exist.
 Decision: the file is titled "Evaluation plan (written after the results)". Its first
 paragraph says it was written on 2026-09-25 from the git history, and that it is not a
 plan made in advance. Each choice (the split, the metrics, the operating point, the
-bootstrap) cites the commit that first fixed it. Each also says whether that commit came
+[bootstrap](../glossary.md#bootstrap)) cites the commit that first fixed it. Each also says whether that commit came
 before or after the first commit that reported results. Choices made after results were
 seen, such as dropping `CODE_GENDER`, get their own section.
 

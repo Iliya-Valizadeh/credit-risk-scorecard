@@ -5,8 +5,8 @@ advance. The results already existed when it was written. It records how the mod
 judged, and for each choice it names the commit that first fixed it. It also says
 whether that commit came before or after the first commit that reported results.
 
-The first commit that reported results is `d2d9e9c` (2026-07-16). Its README gave ROC-AUC
-and PR-AUC for both models on a small sample of the data. So no choice below was made
+The first commit that reported results is `d2d9e9c` (2026-07-16). Its README gave [ROC-AUC](glossary.md#roc-auc)
+and [PR-AUC](glossary.md#pr-auc) for both models on a small sample of the data. So no choice below was made
 before any result was seen. The house standard asks for a plan committed before the
 results, and this repo does not meet that rule. See
 [ADR 0001](decisions/0001-adopting-the-house-standard.md), decision 9.
@@ -14,7 +14,7 @@ results, and this repo does not meet that rule. See
 ## Question
 
 How well can a model built from the application form rank applicants by their chance of
-payment difficulties? And can its scores be read as probabilities at a decline rate a
+payment difficulties? And can its scores be read as probabilities at a [decline rate](glossary.md#decline-rate) a
 lender might use?
 
 ## Data and split
@@ -26,7 +26,7 @@ The data is `application_train.csv` from Kaggle's Home Credit competition. The t
 |---|---|---|
 | Hold out part of the data and report on it | `d2d9e9c`: one stratified split with `test_size=0.2`, so a fifth of the rows held out | Same commit |
 | Use all rows, not a sample | `952b03b` | After |
-| Three parts: train (60%), calibration (20%) and test (20%), each stratified on the target | `952b03b` | After |
+| Three parts: train (60%), [calibration](glossary.md#calibration) (20%) and test (20%), each stratified on the target | `952b03b` | After |
 | The same fixed seed for every split | `d2d9e9c` (`RANDOM_STATE` in `config.py`) | Same commit |
 
 The models see only the train part. The calibrators and the decline threshold see only
@@ -45,7 +45,7 @@ from this table alone. [What's weak](whats_weak.md) ranks this first.
 | ROC-AUC | How well the scores rank defaulters above non-defaulters | `d2d9e9c` | Same commit |
 | PR-AUC | Ranking quality with a focus on the rare defaulters | `d2d9e9c` | Same commit |
 | Precision, recall and decline rate at a threshold | What a decision rule does | `d2d9e9c` | Same commit |
-| Brier score and expected calibration error (ECE) | Whether a predicted PD matches the observed default rate | `c790239` | After |
+| [Brier score](glossary.md#brier-score) and expected calibration error ([ECE](glossary.md#ece)) | Whether a predicted PD matches the observed default rate | `c790239` | After |
 | A 95% [bootstrap](glossary.md#bootstrap) [confidence interval](glossary.md#confidence-interval) for ROC-AUC and PR-AUC, and for the gap between the two models on the same resampled rows | How much each number could move with a different test set | Function in `c790239`, wired in with 1,000 resamples in `952b03b` | After |
 
 No single number was named as the one that decides the project. The README leads with
@@ -67,7 +67,7 @@ setups before and after.
 
 | Choice | First fixed in | Before or after |
 |---|---|---|
-| A fixed cut of 0.40 on the raw LightGBM score, called illustrative | `d2d9e9c` (README text), `952b03b` (in code) | Same commit, then after |
+| A fixed cut of 0.40 on the raw LightGBM score, called illustrative <!-- not-a-claim --> | `d2d9e9c` (README text), `952b03b` (in code) | Same commit, then after |
 | Decline the riskiest 20%, with the threshold set on the calibration part | `7f4f511` | After |
 
 The message of `7f4f511` says why the fixed cut was dropped:
@@ -79,7 +79,7 @@ result. See [ADR 0004](decisions/0004-operating-point-is-a-20-percent-decline-ra
 
 | Choice | First fixed in | Before or after |
 |---|---|---|
-| Fit Platt scaling and isotonic regression on a held-out calibration part | `a0ac986` | After |
+| Fit [Platt scaling](glossary.md#platt-scaling) and [isotonic regression](glossary.md#isotonic-regression) on a held-out calibration part | `a0ac986` | After |
 | Use isotonic regression for every number that needs a PD | `952b03b` | After |
 
 The code comment in `952b03b` says isotonic was chosen before looking at test results.

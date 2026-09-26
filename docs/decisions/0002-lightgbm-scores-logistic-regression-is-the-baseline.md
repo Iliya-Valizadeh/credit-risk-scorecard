@@ -42,12 +42,12 @@ fair:
   `reports/logreg_convergence.md` shows the setups before and after.
 - `c790239` added a paired [bootstrap](../glossary.md#bootstrap) interval for the gap.
   Both models are scored on the same resampled test rows.
-- `952b03b` ran both models on all rows. On the test part, LightGBM's ROC-AUC is higher
+- `952b03b` ran both models on all rows. On the test part, LightGBM's [ROC-AUC](../glossary.md#roc-auc) is higher
   by 0.013 to 0.020 (95% interval, `reports/metrics.json`, key `bootstrap.roc_auc.diff`).
 
 ## Consequences
 
-- LightGBM needs a separate tool to explain it. SHAP plots were added in `3b07ccd`.
+- LightGBM needs a separate tool to explain it. [SHAP](../glossary.md#shap) plots were added in `3b07ccd`.
 - LightGBM is trained with `scale_pos_weight`, so its raw scores are too high to read as
   probabilities. [ADR 0003](0003-held-out-calibration-with-isotonic-regression.md)
   covers the fix.
