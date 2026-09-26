@@ -4,8 +4,8 @@ The full list of limits. The README shows the top few. They are ranked by how mu
 one could change the main result if it were fixed, with the largest first.
 
 The main result has three parts. LightGBM ranks applicants better than logistic
-regression, by 0.013 to 0.020 of ROC-AUC. After calibration, the predicted default
-rates match the observed ones on the test part. At a 20% decline rate, the model
+regression, by 0.013 to 0.020 of [ROC-AUC](glossary.md#roc-auc). After [calibration](glossary.md#calibration), the predicted default
+rates match the observed ones on the test part. At a 20% [decline rate](glossary.md#decline-rate), the model
 catches about half of the applicants who later had payment difficulties. All three are
 measured on one random test part of Kaggle's Home Credit data.
 
@@ -17,7 +17,7 @@ measured on one random test part of Kaggle's Home Credit data.
 | 4 | The evaluation plan was written after the results. The split, the extra metrics, the calibrator and the decline rate were all fixed after results were seen, and the test part has been scored many times | Small to medium. The threshold and calibrators were set on the calibration part, not the test part. But a reader cannot check that no choice was steered by test numbers | [The eval plan](eval_plan.md) is labelled as written after the results and cites the commit behind each choice |
 | 5 | Gender still reaches the model through other inputs. Age enters directly through `DAYS_BIRTH`. The group check covers gender and four age bands only | Large for the fairness finding, none for the ranking. Removing proxies or age could change both the gaps and the model's accuracy | Measured and reported in `reports/gender_check.md`. [ADR 0005](decisions/0005-drop-code-gender-as-a-model-input.md) records the drop of `CODE_GENDER`. No rule decides whether age may be used |
 | 6 | The applicants are Home Credit's, not a Canadian lender's. The target is "payment difficulties", not a formal default definition | Large for any use at a real lender, none for the numbers on this data | Stated in the model card and the README. Both say the model is not for real lending, pricing or collections |
-| 7 | The 20% decline rate has no cost analysis behind it. The expected-loss view rests on an assumed loss rate and exposure | Changes the numbers at the threshold and the expected loss, not the ranking or calibration | Both are labelled illustrative in the README, and the expected loss also in `reports/results.md`. [ADR 0004](decisions/0004-operating-point-is-a-20-percent-decline-rate.md) records the choice |
+| 7 | The 20% decline rate has no cost analysis behind it. The expected-loss view rests on an assumed loss rate and exposure | Changes the numbers at the threshold and the [expected loss](glossary.md#expected-loss), not the ranking or calibration | Both are labelled illustrative in the README, and the expected loss also in `reports/results.md`. [ADR 0004](decisions/0004-operating-point-is-a-20-percent-decline-rate.md) records the choice |
 | 8 | The intervals come from resampling the test rows only. They do not cover a new random split or a new seed | Small. The gap's interval would widen, but it sits well above zero now | Nothing yet |
 | 9 | Missing values are filled in with no flag to say they were missing | Small. A flag might raise the ranking a little | Listed in the README. Nothing else yet |
 | 10 | No check in CI reruns the real evaluation, because the data can't be in the repo. The committed numbers were checked against a fresh run by hand (`6fee45f`) | None today. A later change could break a number without CI noticing | `make eval` reruns everything when the data is present. Tests on synthetic data run in CI |

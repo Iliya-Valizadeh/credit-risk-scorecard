@@ -22,10 +22,10 @@ The history shows these options:
 - Keep the raw scores. This is what the repo did until `a0ac986` added the
   calibrators. Until `2a75872`, the app showed the raw score as a PD, although it was
   too high to read that way.
-- Platt scaling: a logistic regression on the log-odds of the raw score. It has two
+- [Platt scaling](../glossary.md#platt-scaling): a logistic regression on the log-odds of the raw score. It has two
   parameters, so it can only shift and stretch the curve.
-- Isotonic regression: a step function that only has to go up. It is more flexible,
-  but it needs more data and can overfit a small calibration set. The docstring of
+- [Isotonic regression](../glossary.md#isotonic-regression): a step function that only has to go up. It is more flexible,
+  but it needs more data and can overfit a small [calibration](../glossary.md#calibration) set. The docstring of
   `calibrate.py` gives both descriptions.
 
 Both calibrators must be fitted on rows that neither the model nor the test uses.
@@ -49,7 +49,7 @@ calibration on the test part came in the same commit.
   (`reports/metrics.json`, key `calibration`). So the choice between them matters little
   here.
 - Isotonic regression maps many raw scores to the same value, and ties lower the
-  ranking a little. LightGBM's PR-AUC is 0.254 on raw scores and 0.244 after isotonic.
+  ranking a little. LightGBM's [PR-AUC](../glossary.md#pr-auc) is 0.254 on raw scores and 0.244 after isotonic.
   So the decline threshold is set on the raw score
   ([ADR 0004](0004-operating-point-is-a-20-percent-decline-rate.md)), and the
   calibrated PD is used only where a probability is needed.
