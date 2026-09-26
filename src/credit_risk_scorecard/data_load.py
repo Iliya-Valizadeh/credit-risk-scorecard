@@ -1,7 +1,8 @@
 """W1: load raw Home Credit CSVs into PostgreSQL.
 
-Run:  python -m src.data_load
+Run:  python -m credit_risk_scorecard.data_load
 """
+
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -24,7 +25,8 @@ def load(chunksize: int = 50_000) -> None:
         first = True
         for chunk in pd.read_csv(path, chunksize=chunksize):
             chunk.to_sql(
-                table, engine,
+                table,
+                engine,
                 if_exists="replace" if first else "append",
                 index=False,
             )
