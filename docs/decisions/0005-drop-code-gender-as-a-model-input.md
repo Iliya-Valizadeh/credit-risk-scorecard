@@ -10,7 +10,7 @@ The data has a `CODE_GENDER` column. Until `ef4b74b`, both models used it as an 
 The first full-data results, committed in `db53b26`, included a group check by gender
 (added in `d3cfcfe`). That check reports approval rates and error rates for women and
 men at the decline threshold. In the same results, the encoded column `CODE_GENDER_F`
-was the eighth most important input by mean absolute SHAP value (`reports/metrics.json`
+was the eighth most important input by mean absolute [SHAP](../glossary.md#shap) value (`reports/metrics.json`
 at `db53b26`, key `shap_top10`).
 
 ## Options
@@ -38,11 +38,11 @@ check had been seen.
 Commit `04bf471` added `gender_check.py`, which trains the model with and without the
 column on the same split. Its results are in `reports/gender_check.md`:
 
-- The ranking barely changed. The drop cost a small amount of ROC-AUC.
+- The ranking barely changed. The drop cost a small amount of [ROC-AUC](../glossary.md#roc-auc).
 - The gaps between women and men narrowed but did not close.
 - The other inputs still predict gender well. Some of them are among the model's most
   important inputs, so gender still reaches the model through them.
-- Calibration by gender got worse. With the column, predicted and observed default
+- [Calibration](../glossary.md#calibration) by gender got worse. With the column, predicted and observed default
   rates were close for both groups. Without it, the PD is too high for women and too
   low for men.
 
