@@ -32,7 +32,7 @@ overall score of zero as closer to a research project than a production system.
 ## What is scored
 
 The system is the credit-risk pipeline in `src/credit_risk_scorecard/`. It cleans the
-application data, splits it into train, calibration and test parts, trains logistic
+application data, splits it into train, [calibration](glossary.md#calibration) and test parts, trains logistic
 regression and LightGBM, calibrates the scores, sets a decline threshold and checks
 results by group. The real run needs Kaggle's data, which is not in the repo, so it
 runs only by hand with `make eval`.
@@ -62,7 +62,7 @@ earn nothing.
 | # | Test | Score | Evidence or gap |
 |---|---|---|---|
 | 1 | Feature expectations are captured in a schema | none | No schema lists each column's type or allowed range. `clean()` handles one known bad value in `DAYS_EMPLOYED`, but nothing checks the rest |
-| 2 | All features are beneficial | none | SHAP ranks the top inputs in `reports/results.md`, but no test removes an input to see if the model gets worse |
+| 2 | All features are beneficial | none | [SHAP](glossary.md#shap) ranks the top inputs in `reports/results.md`, but no test removes an input to see if the model gets worse |
 | 3 | No feature's cost is too much | none | Not measured |
 | 4 | Features adhere to meta-level requirements | half | The one written rule is that `CODE_GENDER` is not a model input ([ADR 0005](decisions/0005-drop-code-gender-as-a-model-input.md)). `tests/test_leakage.py` checks it in CI. Only half, because no rule covers age, which enters directly through `DAYS_BIRTH`, or the inputs that carry gender |
 | 5 | The data pipeline has appropriate privacy controls | half | The data describes real (anonymised) applicants. `.gitignore` keeps the raw data and the model file out of git, and [ADR 0001](decisions/0001-adopting-the-house-standard.md) (decision 7) writes down why. This is done by hand, and nothing tests it. The template's `.gitignore` would have dropped these rules, and `d7129c6` put them back by hand |
@@ -86,7 +86,7 @@ earn nothing.
 | # | Test | Score | Evidence or gap |
 |---|---|---|---|
 | 1 | Training is reproducible | half | Every random step uses a fixed seed, and CI installs packages from the lockfile. The full run was done twice by hand with identical numbers (`db53b26`), and again after the retrofit, where every counted number matched (`6fee45f`). No automated check reruns it, because CI has no data |
-| 2 | Model specs are unit tested | one point | `tests/test_evaluate.py` checks that both calibrators pull inflated scores back down, that the Brier score and calibration error are right on small cases, and that raising the threshold never declines more applicants. `tests/test_pipeline.py` checks that the logistic regression converges. CI runs them |
+| 2 | Model specs are unit tested | one point | `tests/test_evaluate.py` checks that both calibrators pull inflated scores back down, that the [Brier score](glossary.md#brier-score) and calibration error are right on small cases, and that raising the threshold never declines more applicants. `tests/test_pipeline.py` checks that the logistic regression converges. CI runs them |
 | 3 | The ML pipeline is integration tested | one point | `tests/test_pipeline.py` runs `model.run` from raw synthetic rows through the split, both models, calibration, the threshold and the group check to the results text. `tests/test_demo.py` runs the demo. CI runs both |
 | 4 | Model quality is validated before serving | none | There is no serving step. The Streamlit app loads whatever `models/pipeline.joblib` holds, with no quality gate |
 | 5 | The model is debuggable | none | SHAP values can be computed for any row, but no tool follows one applicant through the model step by step |

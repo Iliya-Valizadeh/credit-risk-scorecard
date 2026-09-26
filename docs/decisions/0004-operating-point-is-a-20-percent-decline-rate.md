@@ -12,9 +12,10 @@ threshold sets how many defaulters are caught and how many good applicants are t
 away.
 
 The first README (`d2d9e9c`) showed a table of thresholds on the raw LightGBM score and
-called a cut of 0.40 an illustrative operating point. It also said the right cut
+called a cut of 0.40 an illustrative operating point. <!-- not-a-claim -->
+It also said the right cut
 depends on the cost of a missed default against the cost of declining a good customer.
-Commit `952b03b` put the 0.40 cut into the code.
+Commit `952b03b` put the 0.40 cut into the code. <!-- not-a-claim -->
 
 Once the model ran on all rows, that cut declined far more applicants than intended.
 The message of `7f4f511` says:
@@ -26,10 +27,10 @@ The message of `7f4f511` says:
   model or its class weighting changes, as the full-data run showed.
 - Set the cut from the costs of each kind of error. This is what a lender would do, but
   the data has no recovery or pricing figures, so the costs would be made up.
-- Pick a decline rate as the policy, and find the score that gives that rate. The
+- Pick a [decline rate](../glossary.md#decline-rate) as the policy, and find the score that gives that rate. The
   commit message calls this "easier to reason about".
 
-For the last option, the threshold can be found on the test part or on the calibration
+For the last option, the threshold can be found on the test part or on the [calibration](../glossary.md#calibration)
 part. Finding it on the test part would let the test rows shape the rule they judge.
 
 ## Decision
