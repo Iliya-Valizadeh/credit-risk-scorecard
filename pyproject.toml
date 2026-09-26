@@ -1,6 +1,6 @@
 [project]
 name = "credit-risk-scorecard"
-version = "0.1.0"
+version = "1.0.0"
 description = "A credit default model on the public Home Credit Default Risk data: a logistic regression baseline and a LightGBM model, trained on all 307,511 applications."
 readme = "README.md"
 license = "MIT"
