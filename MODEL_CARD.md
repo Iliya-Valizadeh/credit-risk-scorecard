@@ -11,9 +11,9 @@ comparison, which is from `python -m credit_risk_scorecard.gender_check`
 ## Model details
 
 A LightGBM classifier, calibrated with [isotonic regression](docs/glossary.md#isotonic-regression),
-trained on Kaggle's Home Credit Default Risk data. It is a portfolio project built by
-one person (Iliya Valizadeh), not a fielded product, and has no license beyond this
-repo's [LICENSE](LICENSE).
+trained on Kaggle's Home Credit Default Risk data. It is a portfolio project I built
+alone, not a fielded product, and has no license beyond this repo's
+[LICENSE](LICENSE).
 
 ## Intended use
 
