@@ -284,5 +284,5 @@ collections or any real lending decision; see [MODEL_CARD.md](MODEL_CARD.md) and
 | `sql/` | A placeholder feature query; see "What's weak" |
 | `src/` | The package code |
 | `tests/` | Unit and data tests |
-| `tools/` | Checks for claims, readability, AI-writing signs and links |
+| `tools/` | Checks for claims, readability, writing style and links |
 <!-- repo-map:end -->

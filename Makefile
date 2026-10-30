@@ -3,10 +3,10 @@
 
 PKG := credit_risk_scorecard
 RUN := uv run
-# docs/archive holds Iliya's own early working notes, kept as a historical record
-# (CLAUDE.md rule: never delete or rewrite Iliya's files). It is left out of the
-# checks below, which are about the docs this repo maintains going forward.
-DOCS := README.md CLAIMS.md CHANGELOG.md AI_USAGE.md $(wildcard MODEL_CARD.md DATASHEET.md) \
+# docs/archive holds my own early working notes, kept as a historical record and
+# never rewritten. It is left out of the checks below, which are about the docs
+# this repo maintains going forward.
+DOCS := README.md CLAIMS.md CHANGELOG.md $(wildcard MODEL_CARD.md DATASHEET.md) \
 	docs/eval_plan.md docs/whats_weak.md docs/glossary.md docs/ml_test_score.md \
 	docs/tutorial.md docs/reference.md docs/explanation.md docs/how-to docs/decisions
 

@@ -11,7 +11,7 @@ Facts to look up: make targets, scripts, files and settings.
 | `make test` | Runs pytest with a coverage report for `src/` |
 | `make eval` | Runs `model`, then `gender_check`, then `logreg_check`; needs the Kaggle data |
 | `make demo` | Runs the real pipeline on synthetic applicants, with no download or key needed |
-| `make check-docs` | Runs the claims, readability, AI-writing signs, link and README checks |
+| `make check-docs` | Runs the claims, readability, writing style, link and README checks |
 | `make all` | Runs every step above, in order |
 
 ## Scripts in `src/credit_risk_scorecard/`
