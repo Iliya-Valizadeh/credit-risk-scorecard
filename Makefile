@@ -3,7 +3,7 @@
 
 PKG := credit_risk_scorecard
 RUN := uv run
-# docs/archive holds my own early working notes, kept as a historical record and
+# docs/archive holds the old requirements files, kept as a historical record and
 # never rewritten. It is left out of the checks below, which are about the docs
 # this repo maintains going forward.
 DOCS := README.md CLAIMS.md CHANGELOG.md $(wildcard MODEL_CARD.md DATASHEET.md) \
