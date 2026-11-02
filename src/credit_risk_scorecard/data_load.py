@@ -19,7 +19,7 @@ def load(chunksize: int = 50_000) -> None:
     for table, fname in TABLES.items():
         path = DATA_DIR / fname
         if not path.exists():
-            print(f"[skip] {fname} not found — see data/README.md")
+            print(f"[skip] {fname} not found, see data/README.md")
             continue
         print(f"[load] {fname} -> {table}")
         first = True

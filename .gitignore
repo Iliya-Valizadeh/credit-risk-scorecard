@@ -1,4 +1,4 @@
-# Data — never commit raw datasets
+# Data: never commit raw datasets
 data/*.csv
 data/*.zip
 data/*.parquet

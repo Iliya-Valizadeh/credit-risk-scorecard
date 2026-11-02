@@ -18,7 +18,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 from credit_risk_scorecard import features as F  # noqa: E402
 
 st.set_page_config(page_title="Credit-Risk Scorecard", page_icon=":bar_chart:")
-st.title("Credit-Risk Scorecard — scoring demo")
+st.title("Credit-Risk Scorecard: scoring demo")
 
 ART = Path(__file__).resolve().parents[1] / "models" / "pipeline.joblib"
 if not ART.exists():
@@ -75,4 +75,4 @@ if st.button("Score applicant"):
         st.error(f"DECLINE: score {score:.3f} is at or above {threshold:.3f}")
     else:
         st.success(f"APPROVE: score {score:.3f} is below {threshold:.3f}")
-    st.caption("Demo only — not a real lending decision.")
+    st.caption("Demo only, not a real lending decision.")
