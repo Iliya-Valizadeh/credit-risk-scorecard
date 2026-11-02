@@ -1,7 +1,7 @@
 # 0003: Held-out calibration with isotonic regression
 
-Date: 2026-09-25, recording choices first made on 2026-09-24 in `a0ac986` and
-`952b03b`. Status: accepted.
+Date: 2026-09-25, recording choices first made on 2026-09-24 in `0ee6448` and
+`acc98ae`. Status: accepted.
 
 This record was written after the fact, from the git history.
 
@@ -20,8 +20,8 @@ default rates by group.
 
 The history shows these options:
 
-- Keep the raw scores. This is what the repo did until `a0ac986` added the
-  calibrators. Until `2a75872`, the app showed the raw score as a PD, although it was
+- Keep the raw scores. This is what the repo did until `0ee6448` added the
+  calibrators. Until `adf6db8`, the app showed the raw score as a PD, although it was
   too high to read that way.
 - [Platt scaling](../glossary.md#platt-scaling): a logistic regression on the log-odds of the raw score. It has two
   parameters, so it can only shift and stretch the curve.
@@ -30,14 +30,14 @@ The history shows these options:
   `calibrate.py` gives both descriptions.
 
 Both calibrators must be fitted on rows that neither the model nor the test uses.
-Commit `952b03b` made that possible. It split the data into train, calibration and test
+Commit `acc98ae` made that possible. It split the data into train, calibration and test
 parts, so the calibrators never see a training row or a test row.
 
 ## Decision
 
 Fit both calibrators on the calibration part, report both on the test part, and use
 isotonic regression wherever a PD is needed. The choice of isotonic is set in
-`DOWNSTREAM_CALIBRATOR` in `model.py`, first in `952b03b`.
+`DOWNSTREAM_CALIBRATOR` in `model.py`, first in `acc98ae`.
 
 The reason given in the code comment and the README is that isotonic was chosen before
 looking at test results, because the calibration part is large (61,502 rows). The

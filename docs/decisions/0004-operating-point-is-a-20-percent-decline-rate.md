@@ -1,6 +1,6 @@
 # 0004: The operating point is a 20% decline rate
 
-Date: 2026-09-25, recording a choice first made on 2026-09-24 in `7f4f511`. Status:
+Date: 2026-09-25, recording a choice first made on 2026-09-24 in `2bcdeb2`. Status:
 accepted.
 
 This record was written after the fact, from the git history.
@@ -15,10 +15,10 @@ The first README (`d2d9e9c`) showed a table of thresholds on the raw LightGBM sc
 called a cut of 0.40 an illustrative operating point. <!-- not-a-claim -->
 It also said the right cut
 depends on the cost of a missed default against the cost of declining a good customer.
-Commit `952b03b` put the 0.40 cut into the code. <!-- not-a-claim -->
+Commit `acc98ae` put the 0.40 cut into the code. <!-- not-a-claim -->
 
 Once the model ran on all rows, that cut declined far more applicants than intended.
-The message of `7f4f511` says:
+The message of `2bcdeb2` says:
 `On full data the old 0.40 raw-score cut declines 45% of applicants, because the class weighting pushes every score up.`
 
 ## Options
@@ -51,6 +51,6 @@ full-data results were seen.
 - The test decline rate can differ a little from 20%, because the threshold comes from
   another set of rows. `reports/metrics.json` records both (key `operating_point`).
 - The group check, the expected-loss view and the app all use this one threshold.
-  Commit `2a75872` made the app read the saved threshold.
+  Commit `adf6db8` made the app read the saved threshold.
 - No cost analysis supports the 20% rate. A lender would set it from its own costs and
   risk appetite, and the group results would change with it.

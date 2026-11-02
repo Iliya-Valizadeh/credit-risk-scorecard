@@ -38,11 +38,11 @@ between the models was small, and it had no interval. The logistic regression ha
 stopped at its iteration limit without converging. Later commits made the comparison
 fair:
 
-- `cbf4ad2` centred the numeric columns so the logistic regression converges.
+- `07cd3cc` centred the numeric columns so the logistic regression converges.
   `reports/logreg_convergence.md` shows the setups before and after.
-- `c790239` added a paired [bootstrap](../glossary.md#bootstrap) interval for the gap.
+- `f658e93` added a paired [bootstrap](../glossary.md#bootstrap) interval for the gap.
   Both models are scored on the same resampled test rows.
-- `952b03b` ran both models on all rows. On the test part, LightGBM's [ROC-AUC](../glossary.md#roc-auc) is higher
+- `acc98ae` ran both models on all rows. On the test part, LightGBM's [ROC-AUC](../glossary.md#roc-auc) is higher
   by 0.013 to 0.020 (95% interval, `reports/metrics.json`, key `bootstrap.roc_auc.diff`).
 
 ## Consequences
@@ -52,7 +52,7 @@ fair:
   probabilities. [ADR 0003](0003-held-out-calibration-with-isotonic-regression.md)
   covers the fix.
 - LightGBM runs with fixed settings. The first README called it "tuned", but no tuning
-  code ever existed. Commit `7f4fa7c` removed that word, and the README now says there
+  code ever existed. Commit `a5eb126` removed that word, and the README now says there
   is no tuning.
 - The baseline is a plain logistic regression on standardised inputs. It is not a
   scorecard with binned inputs, which is what banks use. A stronger baseline might

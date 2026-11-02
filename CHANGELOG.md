@@ -37,7 +37,7 @@ the time:
 
 - 2026-07-16 (`d2d9e9c`): first working pipeline, logistic regression and LightGBM on
   a data sample, with a model-risk write-up.
-- 2026-09-24 (`952b03b`, `7f4f511`): first full-data run, with the train/calibration/
+- 2026-09-24 (`acc98ae`, `2bcdeb2`): first full-data run, with the train/calibration/
   test split, generated reports, and the move to a 20% decline rate.
-- 2026-09-25 (`db53b26` onward): full-data calibration and [SHAP](docs/glossary.md#shap) plots, the gender and
+- 2026-09-25 (`364388b` onward): full-data calibration and [SHAP](docs/glossary.md#shap) plots, the gender and
   age group check, and dropping `CODE_GENDER` from the model.

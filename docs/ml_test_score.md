@@ -38,7 +38,7 @@ results by group. The real run needs Kaggle's data, which is not in the repo, so
 runs only by hand with `make eval`.
 
 The tests in `tests/` use synthetic applicants with the real column names, so CI can
-run them. State on 2026-09-25: CI on GitHub ran these tests on commit `c36fc93` of
+run them. State on 2026-09-25: CI on GitHub ran these tests on commit `8b982d4` of
 branch `phase-b-retrofit`, and they passed ([run][ci-run]). That run failed at a later
 step, the docs checks, which are not scored here. CI runs the tests again on every
 push. A test that CI runs earns one point below. A check that needs the
@@ -65,7 +65,7 @@ earn nothing.
 | 2 | All features are beneficial | none | [SHAP](glossary.md#shap) ranks the top inputs in `reports/results.md`, but no test removes an input to see if the model gets worse |
 | 3 | No feature's cost is too much | none | Not measured |
 | 4 | Features adhere to meta-level requirements | half | The one written rule is that `CODE_GENDER` is not a model input ([ADR 0005](decisions/0005-drop-code-gender-as-a-model-input.md)). `tests/test_leakage.py` checks it in CI. Only half, because no rule covers age, which enters directly through `DAYS_BIRTH`, or the inputs that carry gender |
-| 5 | The data pipeline has appropriate privacy controls | half | The data describes real (anonymised) applicants. `.gitignore` keeps the raw data and the model file out of git, and [ADR 0001](decisions/0001-adopting-the-house-standard.md) (decision 7) writes down why. This is done by hand, and nothing tests it. The template's `.gitignore` would have dropped these rules, and `d7129c6` put them back by hand |
+| 5 | The data pipeline has appropriate privacy controls | half | The data describes real (anonymised) applicants. `.gitignore` keeps the raw data and the model file out of git, and [ADR 0001](decisions/0001-adopting-the-house-standard.md) (decision 7) writes down why. This is done by hand, and nothing tests it. The template's `.gitignore` would have dropped these rules, and `edbe150` put them back by hand |
 | 6 | New features can be added quickly | none | Not measured |
 | 7 | All input feature code is tested | one point | `tests/test_features.py` and `tests/test_leakage.py` cover every line of `features.py`: the bad-value rule, the ratios, the centring and the checks that the target and row id never reach the model. CI runs them. `data_load.py`, the optional loader into PostgreSQL, has no tests, but the model reads the CSV by default |
 
@@ -85,7 +85,7 @@ earn nothing.
 
 | # | Test | Score | Evidence or gap |
 |---|---|---|---|
-| 1 | Training is reproducible | half | Every random step uses a fixed seed, and CI installs packages from the lockfile. The full run was done twice by hand with identical numbers (`db53b26`), and again after the retrofit, where every counted number matched (`6fee45f`). No automated check reruns it, because CI has no data |
+| 1 | Training is reproducible | half | Every random step uses a fixed seed, and CI installs packages from the lockfile. The full run was done twice by hand with identical numbers (`364388b`), and again after the retrofit, where every counted number matched (`f00d1ee`). No automated check reruns it, because CI has no data |
 | 2 | Model specs are unit tested | one point | `tests/test_evaluate.py` checks that both calibrators pull inflated scores back down, that the [Brier score](glossary.md#brier-score) and calibration error are right on small cases, and that raising the threshold never declines more applicants. `tests/test_pipeline.py` checks that the logistic regression converges. CI runs them |
 | 3 | The ML pipeline is integration tested | one point | `tests/test_pipeline.py` runs `model.run` from raw synthetic rows through the split, both models, calibration, the threshold and the group check to the results text. `tests/test_demo.py` runs the demo. CI runs both |
 | 4 | Model quality is validated before serving | none | There is no serving step. The Streamlit app loads whatever `models/pipeline.joblib` holds, with no quality gate |

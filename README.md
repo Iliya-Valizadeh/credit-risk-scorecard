@@ -200,7 +200,7 @@ across 2,000 test applicants.
 
 - Evaluation plan, written after the results, because the results already existed when
   I adopted the house standard: [docs/eval_plan.md](docs/eval_plan.md) (commit
-  `4e4fe87`). It says so plainly, and names the commit behind each choice.
+  `8dc5c70`). It says so plainly, and names the commit behind each choice.
 - Decision records: [docs/decisions/](docs/decisions/), one per past modelling choice
   I could reconstruct from the git history.
 - Error analysis: the gender and age group checks above, and

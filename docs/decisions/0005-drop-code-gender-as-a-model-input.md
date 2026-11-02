@@ -1,17 +1,17 @@
 # 0005: Drop CODE_GENDER as a model input
 
-Date: 2026-09-25, recording a choice made on 2026-09-25 in `ef4b74b`. Status: accepted.
+Date: 2026-09-25, recording a choice made on 2026-09-25 in `ad4587d`. Status: accepted.
 
 This record was written after the fact, from the git history.
 
 ## Context
 
-The data has a `CODE_GENDER` column. Until `ef4b74b`, both models used it as an input.
-The first full-data results, committed in `db53b26`, included a group check by gender
-(added in `d3cfcfe`). That check reports approval rates and error rates for women and
+The data has a `CODE_GENDER` column. Until `ad4587d`, both models used it as an input.
+The first full-data results, committed in `364388b`, included a group check by gender
+(added in `821b1b2`). That check reports approval rates and error rates for women and
 men at the decline threshold. In the same results, the encoded column `CODE_GENDER_F`
 was the eighth most important input by mean absolute [SHAP](../glossary.md#shap) value (`reports/metrics.json`
-at `db53b26`, key `shap_top10`).
+at `364388b`, key `shap_top10`).
 
 ## Options
 
@@ -35,7 +35,7 @@ check had been seen.
 
 ## Consequences
 
-Commit `04bf471` added `gender_check.py`, which trains the model with and without the
+Commit `b7ccdcb` added `gender_check.py`, which trains the model with and without the
 column on the same split. Its results are in `reports/gender_check.md`:
 
 - The ranking barely changed. The drop cost a small amount of [ROC-AUC](../glossary.md#roc-auc).
