@@ -39,7 +39,7 @@ runs only by hand with `make eval`.
 
 The tests in `tests/` use synthetic applicants with the real column names, so CI can
 run them. State on 2026-09-25: CI on GitHub ran these tests on commit `8b982d4` of
-branch `phase-b-retrofit`, and they passed ([run][ci-run]). That run failed at a later
+branch `phase-b-retrofit`, and they passed. That run's log is no longer public. It failed at a later
 step, the docs checks, which are not scored here. CI runs the tests again on every
 push. A test that CI runs earns one point below. A check that needs the
 real data earns half a point at most.
@@ -106,4 +106,3 @@ earn nothing.
 | 7 | Prediction quality has not regressed | none | There is no served data. No automated check compares a fresh run with `reports/metrics.json` |
 
 [breck]: https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/
-[ci-run]: https://github.com/Iliya-Valizadeh/credit-risk-scorecard/actions/runs/36195995781
