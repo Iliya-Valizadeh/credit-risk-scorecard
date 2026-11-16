@@ -31,12 +31,14 @@ from .config import RANDOM_STATE
 GROUP_COLS = ["approval_rate", "tpr", "fpr", "observed_rate", "mean_pd"]
 
 
-def gender_rows(m):
+def gender_rows(m: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     rows = {r["group"]: r for r in m["fairness"]["gender"]}
     return rows["F"], rows["M"]
 
 
-def proxy_table(art, top_shap=20, min_corr=0.10):
+def proxy_table(
+    art: dict[str, Any], top_shap: int = 20, min_corr: float = 0.10
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     names = [n.split("__", 1)[-1] for n in art["pre"].get_feature_names_out()]
     known = art["X_tr"]["CODE_GENDER"].isin(["F", "M"]).to_numpy()
     is_male = (art["X_tr"]["CODE_GENDER"] == "M").to_numpy()[known].astype(float)
@@ -58,7 +60,7 @@ def proxy_table(art, top_shap=20, min_corr=0.10):
     return proxies.sort_values("shap_rank"), most_corr
 
 
-def gender_predictability(art):
+def gender_predictability(art: dict[str, Any]) -> float:
     tr = art["X_tr"]["CODE_GENDER"].isin(["F", "M"]).to_numpy()
     te = art["X_te"]["CODE_GENDER"].isin(["F", "M"]).to_numpy()
     y_tr = (art["X_tr"]["CODE_GENDER"] == "M").to_numpy()[tr]
@@ -67,7 +69,7 @@ def gender_predictability(art):
     return float(roc_auc_score(y_te, clf.predict_proba(art["Xte"][te])[:, 1]))
 
 
-def main():
+def main() -> None:
     df = M.load_frame()
     with_g = M.run(df, exclude=(), n_boot=200, figures=False, save=False)
     art: dict[str, Any] = {}

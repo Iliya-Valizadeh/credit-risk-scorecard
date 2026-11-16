@@ -6,10 +6,16 @@ Figures saved to reports/figures/.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from pathlib import Path
+from typing import Any
+
 import numpy as np
 
 
-def shap_values_for(model, X_transformed, sample=2000, seed=42):
+def shap_values_for(
+    model: Any, X_transformed: Any, sample: int = 2000, seed: int = 42
+) -> tuple[Any, np.ndarray, np.ndarray]:
     """Compute SHAP values on a random sample of rows of the transformed matrix."""
     import shap
 
@@ -25,7 +31,9 @@ def shap_values_for(model, X_transformed, sample=2000, seed=42):
     return explainer, sv, Xs
 
 
-def top_features(sv, feature_names, k=10) -> list[tuple[str, float]]:
+def top_features(
+    sv: np.ndarray, feature_names: Sequence[str], k: int = 10
+) -> list[tuple[str, float]]:
     """Features ranked by mean absolute SHAP value, with the column-transformer prefix removed."""
     imp = np.abs(sv).mean(axis=0)
     order = np.argsort(imp)[::-1][:k]
@@ -33,7 +41,9 @@ def top_features(sv, feature_names, k=10) -> list[tuple[str, float]]:
     return [(clean[i], float(imp[i])) for i in order]
 
 
-def save_summary(sv, Xs, feature_names, path):
+def save_summary(
+    sv: np.ndarray, Xs: np.ndarray, feature_names: Sequence[str], path: str | Path
+) -> None:
     import matplotlib
 
     matplotlib.use("Agg")

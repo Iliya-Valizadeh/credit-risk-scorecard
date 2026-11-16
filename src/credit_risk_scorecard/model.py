@@ -16,11 +16,14 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from collections.abc import Sequence
 from typing import Any
 
 import joblib
 import numpy as np
 import pandas as pd
+from numpy.typing import ArrayLike
+from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
@@ -36,6 +39,8 @@ REPORTS_DIR = ROOT / "reports"
 FLAG_RATE = 0.20  # illustrative policy: decline the riskiest 20% of applicants
 DOWNSTREAM_CALIBRATOR = "isotonic"  # chosen before looking at test results; see README
 
+SplitPart = tuple[pd.DataFrame, pd.Series]
+
 
 def load_frame(from_db: bool = False) -> pd.DataFrame:
     if from_db:
@@ -45,7 +50,7 @@ def load_frame(from_db: bool = False) -> pd.DataFrame:
     return pd.read_csv(DATA_DIR / "application_train.csv")
 
 
-def split(df: pd.DataFrame, sample: int | None = None):
+def split(df: pd.DataFrame, sample: int | None = None) -> tuple[SplitPart, SplitPart, SplitPart]:
     """Clean, optionally sample, and split 60/20/20 into train / calibration / test."""
     if sample:
         df, _ = train_test_split(
@@ -63,13 +68,13 @@ def split(df: pd.DataFrame, sample: int | None = None):
     return (X_tr, y_tr), (X_cal, y_cal), (X_te, y_te)
 
 
-def train_baseline(Xtr, ytr, max_iter=2000):
+def train_baseline(Xtr: Any, ytr: ArrayLike, max_iter: int = 2000) -> LogisticRegression:
     clf = LogisticRegression(max_iter=max_iter, class_weight="balanced")
     clf.fit(Xtr, ytr)
     return clf
 
 
-def train_boosted(Xtr, ytr):
+def train_boosted(Xtr: Any, ytr: pd.Series) -> Any:
     import lightgbm as lgb
 
     neg, pos = (ytr == 0).sum(), (ytr == 1).sum()
@@ -89,7 +94,7 @@ def train_boosted(Xtr, ytr):
     return clf
 
 
-def template_row(X_raw: pd.DataFrame) -> dict:
+def template_row(X_raw: pd.DataFrame) -> dict[str, Any]:
     """A 'typical applicant': medians for numerics, modes for categoricals.
     The Streamlit app overlays user inputs on this so it can score from a few fields."""
     row: dict[str, Any] = {}
@@ -103,7 +108,13 @@ def template_row(X_raw: pd.DataFrame) -> dict:
     return row
 
 
-def save_artifacts(pre, model, calibrator, X_raw, threshold):
+def save_artifacts(
+    pre: ColumnTransformer,
+    model: Any,
+    calibrator: Any,
+    X_raw: pd.DataFrame,
+    threshold: float,
+) -> None:
     MODELS_DIR.mkdir(exist_ok=True)
     joblib.dump(
         {
@@ -125,9 +136,9 @@ def run(
     n_boot: int = 1000,
     figures: bool = True,
     save: bool = True,
-    exclude=F.NOT_MODEL_INPUTS,
-    artifacts: dict | None = None,
-) -> dict:
+    exclude: Sequence[str] = F.NOT_MODEL_INPUTS,
+    artifacts: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Train, calibrate and evaluate. `exclude` lists columns kept out of the model
     (they stay in the data for the group check). Pass a dict as `artifacts` to get the
     fitted objects and test matrices back, for follow-up analysis."""
@@ -266,16 +277,19 @@ def run(
     return m
 
 
-def write_reports(m: dict) -> None:
+def write_reports(m: dict[str, Any]) -> None:
     REPORTS_DIR.mkdir(exist_ok=True)
     (REPORTS_DIR / "metrics.json").write_text(json.dumps(m, indent=2), encoding="utf-8")
     (REPORTS_DIR / "results.md").write_text(results_markdown(m), encoding="utf-8")
     print(f"[saved] {REPORTS_DIR / 'metrics.json'}, {REPORTS_DIR / 'results.md'}")
 
 
-def results_markdown(m: dict) -> str:
+def results_markdown(m: dict[str, Any]) -> str:
     d, b = m["data"], m["bootstrap"]
-    ci = lambda k, mdl: f"{b[k][mdl]['lo']:.3f} to {b[k][mdl]['hi']:.3f}"  # noqa: E731
+
+    def ci(k: str, mdl: str) -> str:
+        return f"{b[k][mdl]['lo']:.3f} to {b[k][mdl]['hi']:.3f}"
+
     L = [
         "# Results",
         "",
@@ -384,7 +398,7 @@ def results_markdown(m: dict) -> str:
     return "\n".join(L) + "\n"
 
 
-def main():
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--sample", type=int, default=None)
     ap.add_argument("--from-db", action="store_true")

@@ -1,10 +1,11 @@
 """The tests never need the Kaggle data, so they run in CI."""
 
+import pandas as pd
 import pytest
 
 from credit_risk_scorecard.synthetic import make_applicants
 
 
 @pytest.fixture
-def applicants():
+def applicants() -> pd.DataFrame:
     return make_applicants()

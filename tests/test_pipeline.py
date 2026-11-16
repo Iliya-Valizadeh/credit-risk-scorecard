@@ -1,9 +1,11 @@
 """End-to-end run on synthetic data: every section of the report gets filled."""
 
+import pandas as pd
+
 from credit_risk_scorecard import model as M
 
 
-def test_run_end_to_end(applicants):
+def test_run_end_to_end(applicants: pd.DataFrame) -> None:
     m = M.run(applicants, n_boot=20, figures=False, save=False)
     assert m["data"]["rows_used"] == len(applicants)
     assert m["logreg_convergence"]["converged"]

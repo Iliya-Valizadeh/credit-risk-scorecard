@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
+from pathlib import Path
+from typing import Any
+
 import matplotlib
 import numpy as np
 import pandas as pd
+from matplotlib.figure import Figure
+from numpy.typing import ArrayLike
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -19,14 +25,18 @@ from sklearn.metrics import (  # noqa: E402
 )
 
 
-def headline(y_true, proba) -> dict:
+def headline(y_true: ArrayLike, proba: ArrayLike) -> dict[str, float]:
     return {
         "roc_auc": roc_auc_score(y_true, proba),
         "pr_auc": average_precision_score(y_true, proba),
     }
 
 
-def threshold_table(y_true, proba, thresholds=(0.3, 0.4, 0.5, 0.6, 0.7)) -> pd.DataFrame:
+def threshold_table(
+    y_true: ArrayLike,
+    proba: np.ndarray,
+    thresholds: Iterable[float] = (0.3, 0.4, 0.5, 0.6, 0.7),
+) -> pd.DataFrame:
     """Precision/recall/flag-rate at each decision threshold.
 
     'flag_rate' = share of applicants predicted high-risk (declined). The bank trades
@@ -47,12 +57,12 @@ def threshold_table(y_true, proba, thresholds=(0.3, 0.4, 0.5, 0.6, 0.7)) -> pd.D
     return pd.DataFrame(rows).round(4)
 
 
-def brier(y_true, proba) -> float:
+def brier(y_true: ArrayLike, proba: ArrayLike) -> float:
     """Mean squared gap between predicted PD and the 0/1 outcome. Lower is better."""
     return float(brier_score_loss(y_true, proba))
 
 
-def ece(y_true, proba, n_bins=10) -> float:
+def ece(y_true: ArrayLike, proba: ArrayLike, n_bins: int = 10) -> float:
     """Expected calibration error with equal-count bins.
 
     Sort applicants by predicted PD, cut them into n_bins groups of equal size, and take
@@ -71,13 +81,13 @@ def ece(y_true, proba, n_bins=10) -> float:
 
 
 def bootstrap_ci(
-    y_true,
-    scores: dict,
-    metric=roc_auc_score,
-    n_boot=1000,
-    seed=42,
+    y_true: ArrayLike,
+    scores: dict[str, Any],
+    metric: Callable[[Any, Any], float] = roc_auc_score,
+    n_boot: int = 1000,
+    seed: int = 42,
     diff: tuple[str, str] | None = None,
-) -> dict:
+) -> dict[str, dict[str, float]]:
     """95% percentile intervals from resampling the test rows with replacement.
 
     `scores` maps a model name to its scores on the same rows. Every model is scored on
@@ -99,14 +109,19 @@ def bootstrap_ci(
             draws[name].append(v)
         if diff:
             draws["diff"].append(vals[diff[0]] - vals[diff[1]])
-    out = {}
+    out: dict[str, dict[str, float]] = {}
     for name, d in draws.items():
         lo, hi = np.percentile(d, [2.5, 97.5])
         out[name] = {"lo": float(lo), "hi": float(hi)}
     return out
 
 
-def plot_calibration(y_true, probas: dict, path=None, n_bins=10):
+def plot_calibration(
+    y_true: ArrayLike,
+    probas: dict[str, Any],
+    path: str | Path | None = None,
+    n_bins: int = 10,
+) -> Figure:
     """Reliability curve for one or more sets of predicted PDs on the same rows."""
     fig, ax = plt.subplots(figsize=(5.5, 5.5))
     top = 0.0

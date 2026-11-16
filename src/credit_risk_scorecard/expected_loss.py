@@ -16,11 +16,19 @@ assumptions, not estimates:
 from __future__ import annotations
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 LGD = 0.45
 
 
-def expected_loss_table(y_true, ead, raw_pd, calibrated_pd, threshold, lgd=LGD) -> dict:
+def expected_loss_table(
+    y_true: ArrayLike,
+    ead: ArrayLike,
+    raw_pd: ArrayLike,
+    calibrated_pd: ArrayLike,
+    threshold: float,
+    lgd: float = LGD,
+) -> dict[str, float]:
     """Loss on the applicants the model would approve (raw score below threshold).
 
     Compares the loss each set of PDs predicts with the loss the observed outcomes imply,

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
 from credit_risk_scorecard import evaluate as E
 from credit_risk_scorecard.calibrate import CALIBRATORS
@@ -7,14 +8,16 @@ from credit_risk_scorecard.expected_loss import expected_loss_table
 
 
 @pytest.fixture
-def scored():
+def scored() -> tuple[NDArray[np.int_], NDArray[np.float64]]:
     rng = np.random.default_rng(1)
     p = rng.uniform(0, 0.4, 5000)
     y = (rng.random(5000) < p).astype(int)
     return y, p
 
 
-def test_threshold_metrics_move_the_right_way(scored):
+def test_threshold_metrics_move_the_right_way(
+    scored: tuple[NDArray[np.int_], NDArray[np.float64]],
+) -> None:
     y, p = scored
     t = E.threshold_table(y, p, thresholds=np.linspace(0.05, 0.35, 7))
     # Raising the threshold can only flag fewer applicants and catch fewer defaulters.
@@ -22,7 +25,7 @@ def test_threshold_metrics_move_the_right_way(scored):
     assert (np.diff(t["recall"]) <= 0).all()
 
 
-def test_brier_and_ece_on_toy_examples():
+def test_brier_and_ece_on_toy_examples() -> None:
     y = np.array([0, 0, 1, 1])
     assert E.brier(y, np.array([0, 0, 1, 1])) == 0
     assert E.brier(y, np.array([1, 1, 0, 0])) == 1
@@ -31,14 +34,18 @@ def test_brier_and_ece_on_toy_examples():
     assert E.ece(y, np.full(4, 0.9), n_bins=1) == pytest.approx(0.4)
 
 
-def test_calibrated_data_has_small_ece(scored):
+def test_calibrated_data_has_small_ece(
+    scored: tuple[NDArray[np.int_], NDArray[np.float64]],
+) -> None:
     y, p = scored
     assert E.ece(y, p) < 0.03
     assert E.ece(y, np.clip(p * 3, 0, 1)) > 0.1
 
 
 @pytest.mark.parametrize("name", list(CALIBRATORS))
-def test_calibrators_fix_inflated_scores(scored, name):
+def test_calibrators_fix_inflated_scores(
+    scored: tuple[NDArray[np.int_], NDArray[np.float64]], name: str
+) -> None:
     y, p = scored
     inflated = np.clip(p * 2.5, 0, 1)  # what class weighting does
     cal = CALIBRATORS[name]().fit(inflated[:2500], y[:2500])
@@ -47,7 +54,9 @@ def test_calibrators_fix_inflated_scores(scored, name):
     assert E.brier(y[2500:], fixed) < E.brier(y[2500:], inflated[2500:])
 
 
-def test_bootstrap_interval_contains_point_estimate(scored):
+def test_bootstrap_interval_contains_point_estimate(
+    scored: tuple[NDArray[np.int_], NDArray[np.float64]],
+) -> None:
     y, p = scored
     from sklearn.metrics import roc_auc_score
 
@@ -58,7 +67,7 @@ def test_bootstrap_interval_contains_point_estimate(scored):
     assert ci["diff"]["lo"] > 0  # a is clearly better than b
 
 
-def test_expected_loss_counts_only_approved():
+def test_expected_loss_counts_only_approved() -> None:
     y = np.array([1, 0, 1])
     ead = np.array([100.0, 100.0, 100.0])
     raw = np.array([0.1, 0.2, 0.9])  # third applicant declined

@@ -9,6 +9,8 @@ Run:  python -m credit_risk_scorecard.demo
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 
 from . import features as F
@@ -27,7 +29,7 @@ def main() -> int:
     print()
 
     train_df = make_applicants(n=3000, seed=1)
-    artifacts: dict = {}
+    artifacts: dict[str, Any] = {}
     m = M.run(train_df, n_boot=200, figures=False, save=False, artifacts=artifacts)
 
     print(

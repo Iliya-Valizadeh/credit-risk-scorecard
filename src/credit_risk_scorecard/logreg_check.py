@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import time
 import warnings
+from typing import Any
 
+import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.impute import SimpleImputer
@@ -29,7 +31,7 @@ from . import features as F
 from . import model as M
 
 
-def old_preprocessor(X):
+def old_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
     numeric, categorical = F.split_columns(X)
     return ColumnTransformer(
         [
@@ -57,7 +59,15 @@ def old_preprocessor(X):
     )
 
 
-def fit_and_score(pre, clf, X_tr, y_tr, X_te, y_te, dtype="float64"):
+def fit_and_score(
+    pre: ColumnTransformer,
+    clf: LogisticRegression,
+    X_tr: pd.DataFrame,
+    y_tr: pd.Series,
+    X_te: pd.DataFrame,
+    y_te: pd.Series,
+    dtype: str = "float64",
+) -> dict[str, Any]:
     t0 = time.time()
     Xtr = pre.fit_transform(X_tr).astype(dtype)
     with warnings.catch_warnings(record=True) as w:
@@ -75,9 +85,12 @@ def fit_and_score(pre, clf, X_tr, y_tr, X_te, y_te, dtype="float64"):
     }
 
 
-def main():
+def main() -> None:
     (X_tr, y_tr), _, (X_te, y_te) = M.split(M.load_frame())
-    saga = lambda: LogisticRegression(solver="saga", max_iter=1000, class_weight="balanced")  # noqa: E731
+
+    def saga() -> LogisticRegression:
+        return LogisticRegression(solver="saga", max_iter=1000, class_weight="balanced")
+
     old = fit_and_score(old_preprocessor(X_tr), saga(), X_tr, y_tr, X_te, y_te, "float64")
     old32 = fit_and_score(old_preprocessor(X_tr), saga(), X_tr, y_tr, X_te, y_te, "float32")
     new = fit_and_score(

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from numpy.typing import ArrayLike
 
 
 def age_band(days_birth: pd.Series) -> pd.Series:
@@ -27,7 +28,14 @@ def age_band(days_birth: pd.Series) -> pd.Series:
     ).astype(str)
 
 
-def group_table(groups, y_true, raw_score, calibrated_pd, threshold, min_n=100) -> pd.DataFrame:
+def group_table(
+    groups: ArrayLike,
+    y_true: ArrayLike,
+    raw_score: ArrayLike,
+    calibrated_pd: ArrayLike,
+    threshold: float,
+    min_n: int = 100,
+) -> pd.DataFrame:
     df = pd.DataFrame(
         {
             "group": np.asarray(groups),

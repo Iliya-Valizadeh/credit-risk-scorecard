@@ -28,6 +28,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from numpy.typing import ArrayLike
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 
@@ -53,7 +54,7 @@ def _woe(bad: np.ndarray, good: np.ndarray, total_bad: float, total_good: float)
     return np.log(((bad + SMOOTH) / total_bad) / ((good + SMOOTH) / total_good))
 
 
-def _iv(bad, good, total_bad, total_good) -> float:
+def _iv(bad: np.ndarray, good: np.ndarray, total_bad: float, total_good: float) -> float:
     w = _woe(bad, good, total_bad, total_good)
     return float(np.sum((bad / total_bad - good / total_good) * w))
 
@@ -97,7 +98,7 @@ class FeatureBins:
             idx = np.where(np.isnan(v), self.missing_bin, idx)
             return idx.astype(int)
         s = x.astype("object").where(x.notna(), "MISSING").astype(str)
-        return s.map(self.levels).fillna(self.unseen_bin).to_numpy(dtype=int)
+        return np.asarray(s.map(self.levels).fillna(self.unseen_bin).to_numpy(dtype=int))
 
     def transform(self, x: pd.Series) -> np.ndarray:
         idx = self.bin_index(x)
@@ -216,7 +217,7 @@ class WoEScorecard:
         self.dropped: dict[str, float] = {}
         self.lr: LogisticRegression | None = None
 
-    def fit(self, X: pd.DataFrame, y) -> WoEScorecard:
+    def fit(self, X: pd.DataFrame, y: ArrayLike) -> WoEScorecard:
         yv = np.asarray(y, dtype=float)
         numeric, categorical = F.split_columns(X)
         for c in numeric:
@@ -248,7 +249,7 @@ class WoEScorecard:
 
     def predict_pd(self, X: pd.DataFrame) -> np.ndarray:
         assert self.lr is not None
-        return self.lr.predict_proba(self.woe_matrix(X))[:, 1]
+        return np.asarray(self.lr.predict_proba(self.woe_matrix(X))[:, 1])
 
     def points_table(self) -> pd.DataFrame:
         """One row per feature bin: the points it adds. Score = sum of one row per feature."""
@@ -310,7 +311,7 @@ def score_psi(s_ref: np.ndarray, s_new: np.ndarray, n_bins: int = 10) -> float:
     return psi(ref / ref.sum(), new / new.sum())
 
 
-def approved_bad_rate(y, pd_hat, threshold: float) -> dict:
+def approved_bad_rate(y: ArrayLike, pd_hat: ArrayLike, threshold: float) -> dict[str, float]:
     y = np.asarray(y)
     approved = np.asarray(pd_hat) < threshold
     return {
@@ -321,7 +322,9 @@ def approved_bad_rate(y, pd_hat, threshold: float) -> dict:
     }
 
 
-def compare(art: dict, n_boot: int = 1000) -> tuple[dict[str, Any], pd.DataFrame, pd.DataFrame]:
+def compare(
+    art: dict[str, Any], n_boot: int = 1000
+) -> tuple[dict[str, Any], pd.DataFrame, pd.DataFrame]:
     """Fit the scorecard on the same split `model.run` used and compare on test.
 
     `art` is the dict `model.run(..., artifacts=art)` fills in. Returns metrics, the points
@@ -394,7 +397,7 @@ def main() -> None:
     ap.add_argument("--sample", type=int, default=None)
     ap.add_argument("--n-boot", type=int, default=1000)
     a = ap.parse_args()
-    art: dict = {}
+    art: dict[str, Any] = {}
     base = M.run(
         M.load_frame(), sample=a.sample, n_boot=a.n_boot, figures=False, save=False, artifacts=art
     )

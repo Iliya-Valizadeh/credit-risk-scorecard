@@ -9,6 +9,8 @@ Decisions here are driven by the Sprint 1 EDA:
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -40,7 +42,9 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def split_columns(X: pd.DataFrame, exclude=NOT_MODEL_INPUTS) -> tuple[list[str], list[str]]:
+def split_columns(
+    X: pd.DataFrame, exclude: Sequence[str] = NOT_MODEL_INPUTS
+) -> tuple[list[str], list[str]]:
     """Return (numeric_cols, categorical_cols) for the model: no id column, and none of
     the columns in `exclude`."""
     skip = {ID_COL, *exclude}
@@ -50,7 +54,9 @@ def split_columns(X: pd.DataFrame, exclude=NOT_MODEL_INPUTS) -> tuple[list[str],
     return numeric, categorical
 
 
-def build_preprocessor(X: pd.DataFrame, exclude=NOT_MODEL_INPUTS) -> ColumnTransformer:
+def build_preprocessor(
+    X: pd.DataFrame, exclude: Sequence[str] = NOT_MODEL_INPUTS
+) -> ColumnTransformer:
     """Impute + standardise numerics, impute + one-hot categoricals. Dense output.
 
     The first version used StandardScaler(with_mean=False) to keep the matrix sparse.

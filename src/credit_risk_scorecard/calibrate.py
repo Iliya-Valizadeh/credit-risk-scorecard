@@ -16,41 +16,42 @@ from __future__ import annotations
 from typing import Protocol
 
 import numpy as np
+from numpy.typing import ArrayLike
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
 
 _EPS = 1e-6
 
 
-def _logit(p):
-    p = np.clip(np.asarray(p, dtype=float), _EPS, 1 - _EPS)
-    return np.log(p / (1 - p)).reshape(-1, 1)
+def _logit(p: ArrayLike) -> np.ndarray:
+    q = np.clip(np.asarray(p, dtype=float), _EPS, 1 - _EPS)
+    return np.asarray(np.log(q / (1 - q)).reshape(-1, 1))
 
 
 class PlattCalibrator:
-    def fit(self, raw, y):
+    def fit(self, raw: ArrayLike, y: ArrayLike) -> PlattCalibrator:
         self._lr = LogisticRegression(C=1e6, max_iter=1000).fit(_logit(raw), y)
         return self
 
-    def predict(self, raw):
-        return self._lr.predict_proba(_logit(raw))[:, 1]
+    def predict(self, raw: ArrayLike) -> np.ndarray:
+        return np.asarray(self._lr.predict_proba(_logit(raw))[:, 1])
 
 
 class IsotonicCalibrator:
-    def fit(self, raw, y):
+    def fit(self, raw: ArrayLike, y: ArrayLike) -> IsotonicCalibrator:
         self._iso = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
         self._iso.fit(np.asarray(raw, dtype=float), y)
         return self
 
-    def predict(self, raw):
-        return self._iso.predict(np.asarray(raw, dtype=float))
+    def predict(self, raw: ArrayLike) -> np.ndarray:
+        return np.asarray(self._iso.predict(np.asarray(raw, dtype=float)))
 
 
 class Calibrator(Protocol):
     """Shared shape of the two calibrators below, for type-checking CALIBRATORS."""
 
-    def fit(self, raw, y) -> Calibrator: ...
-    def predict(self, raw): ...
+    def fit(self, raw: ArrayLike, y: ArrayLike) -> Calibrator: ...
+    def predict(self, raw: ArrayLike) -> np.ndarray: ...
 
 
 CALIBRATORS: dict[str, type[Calibrator]] = {
