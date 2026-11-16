@@ -13,6 +13,13 @@ git tag.
   train-versus-test [PSI](docs/glossary.md#psi) check and a comparison with LightGBM on
   the same split (2026-11-16).
 
+### Changed
+
+- Turned on mypy strict mode for `src/` and `tests/`, with annotations on every function
+  (2026-11-16).
+- Added tests for the modules that had none, and raised the coverage floor to 99%
+  (2026-11-16).
+
 ## [1.0.0] - 2026-09-26
 
 ### Added

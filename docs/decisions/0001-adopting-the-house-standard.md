@@ -179,6 +179,10 @@ new module added in this phase, such as `demo.py` and `synthetic.py`, must reach
 its own in the coverage report. A `roadmap` issue will track raising the whole package to
 80%. <!-- not-a-claim -->
 
+Update, 2026-11-16: the floor is now 99%. New tests on synthetic data, with files
+written to temporary folders, cover the modules that had none. The decision above is
+left as written because it records what was true on the day.
+
 ### 9. The eval plan, written after the results
 
 The standard wants `docs/eval_plan.md` committed before the results. That can't happen
@@ -202,6 +206,9 @@ when the fix cannot change behavior. Any other finding gets a per-rule ignore wi
 one-line reason. mypy runs on `src/` in its default mode with `check_untyped_defs`,
 not in strict mode. It ignores missing type stubs for packages that ship none.
 Strict mode becomes a `roadmap` issue.
+
+Update, 2026-11-16: mypy now runs in strict mode on `src/` and `tests/`. Every function
+has annotations. Results did not change.
 
 Why: strict mode would mean annotating every function in code that already works. That
 is a large diff with a real chance of a mistake, and it would not change any claim.

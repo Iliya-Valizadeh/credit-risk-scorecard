@@ -18,6 +18,7 @@ one line by hand, add the comment `<!-- not-a-claim -->` to it.
 | Illustrative [decline rate](docs/glossary.md#decline-rate) | 20% | `src/credit_risk_scorecard/model.py` | `make eval` |
 | LightGBM hyperparameters | 600 trees; 0.02 learning rate; 31 leaves | `src/credit_risk_scorecard/model.py` | `make eval` |
 | Assumed [LGD](docs/glossary.md#lgd) | 45% | `src/credit_risk_scorecard/expected_loss.py` | `make eval` |
+| Test coverage floor | 99% | `pyproject.toml` | `make test` |
 | [ROC-AUC](docs/glossary.md#roc-auc) and [PR-AUC](docs/glossary.md#pr-auc) by model, with 95% intervals | 0.752 (0.745-0.759); 0.227 (0.216-0.238); 0.769 (0.762-0.775); 0.254 (0.242-0.265) | `reports/metrics.json` | `make eval` |
 | Gap between models (bootstrap) | 0.013 to 0.020 ROC-AUC; 0.021 to 0.033 PR-AUC | `reports/metrics.json#bootstrap` | `make eval` |
 | Calibration table (raw, Platt, isotonic) | 0.395; 0.1851; 0.3145; 0.080; 0.0673; 0.0032; 0.0027; 0.768; 0.769 | `reports/metrics.json#calibration` | `make eval` |
