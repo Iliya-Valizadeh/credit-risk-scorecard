@@ -43,6 +43,11 @@ rate.
 What a lender expects to lose on a loan: the chance of default, times the loss given
 default, times the amount at risk.
 
+## IV
+
+Information value: how well one input's bins separate defaulters from non-defaulters,
+added up over its bins. Near zero means the input tells you little.
+
 ## Isotonic regression
 
 A way to calibrate scores into probabilities. It fits a curve that only ever goes up,
@@ -76,3 +81,8 @@ a random non-defaulter. 0.5 is no better than a coin flip; 1.0 is perfect. <!-- 
 
 A method that splits one prediction into the amount each input added or took away, so
 the prediction can be explained input by input.
+
+## WoE
+
+Weight of evidence: for one bin of an input, the log of its share of defaulters divided
+by its share of non-defaulters. A higher value means a riskier bin.

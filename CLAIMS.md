@@ -37,6 +37,13 @@ one line by hand, add the comment `<!-- not-a-claim -->` to it.
 | SHAP sample size | 2,000 | `src/credit_risk_scorecard/model.py` | `make eval` |
 | Logistic regression convergence (iterations, ROC-AUC) | 1,000; 149; 227; 0.7533; 0.7524; 0.752; 0.753 | `reports/logreg_convergence.md` | `python -m credit_risk_scorecard.logreg_check` |
 | Retrain trigger (lower bound of test interval) | 0.762 | `reports/metrics.json#bootstrap.roc_auc.lightgbm.lo` | `make eval` |
+| Binned scorecard inputs (candidates, dropped for low [IV](docs/glossary.md#iv), dropped for sign, kept; IV cut) | 122; 73; 19; 30; 0.02 | `reports/woe_metrics.json` | `python -m credit_risk_scorecard.woe_scorecard` |
+| Binned scorecard points scale (points at odds, points to double odds) | 600; 50; 20 | `reports/woe_metrics.json#points` | `python -m credit_risk_scorecard.woe_scorecard` |
+| Binned scorecard ROC-AUC by model, with 95% intervals | 0.743 (0.736-0.750); 0.769 (0.762-0.775) | `reports/woe_metrics.json#roc_auc` | `python -m credit_risk_scorecard.woe_scorecard` |
+| Gap, LightGBM minus binned scorecard (bootstrap) | 0.023 to 0.029 ROC-AUC | `reports/woe_metrics.json#roc_auc.gap_lightgbm_minus_scorecard_ci` | `python -m credit_risk_scorecard.woe_scorecard` |
+| Binned scorecard and isotonic LightGBM calibration (Brier, [ECE](docs/glossary.md#ece)) | 0.0688; 0.0026; 0.0673; 0.0027 | `reports/woe_metrics.json#calibration` | `python -m credit_risk_scorecard.woe_scorecard` |
+| Bad rate among approved at about a 20% decline rate (scorecard, LightGBM; share declined; all applicants) | 5.09%; 4.70%; 19.8%; 19.5%; 8.07% | `reports/woe_metrics.json#approved_bad_rate_at_20pct_decline` | `python -m credit_risk_scorecard.woe_scorecard` |
+| Train-vs-test [PSI](docs/glossary.md#psi) (score, largest input) | 0.0001; 0.0004 | `reports/woe_metrics.json#psi_train_vs_test` | `python -m credit_risk_scorecard.woe_scorecard` |
 
 Numbers not traced above are marked `<!-- not-a-claim -->` in place, for one of three
 reasons:

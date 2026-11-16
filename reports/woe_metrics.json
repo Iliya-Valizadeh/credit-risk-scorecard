@@ -1,0 +1,123 @@
+{
+  "n_candidate_features": 122,
+  "n_kept": 30,
+  "n_dropped_iv_below_min": 73,
+  "min_iv": 0.02,
+  "n_dropped_for_negative_coefficient": 19,
+  "n_negative_coefficients": 0,
+  "top_iv": [
+    [
+      "EXT_SOURCE_3",
+      0.3301
+    ],
+    [
+      "EXT_SOURCE_2",
+      0.318
+    ],
+    [
+      "EXT_SOURCE_1",
+      0.1517
+    ],
+    [
+      "DAYS_EMPLOYED",
+      0.1151
+    ],
+    [
+      "OCCUPATION_TYPE",
+      0.0737
+    ],
+    [
+      "ORGANIZATION_TYPE",
+      0.0585
+    ],
+    [
+      "REGION_RATING_CLIENT_W_CITY",
+      0.0537
+    ],
+    [
+      "REGION_RATING_CLIENT",
+      0.0506
+    ],
+    [
+      "NAME_EDUCATION_TYPE",
+      0.0482
+    ],
+    [
+      "AMT_GOODS_PRICE",
+      0.0466
+    ]
+  ],
+  "points": {
+    "pdo": 20.0,
+    "base_score": 600.0,
+    "base_odds_good_to_bad": 50.0
+  },
+  "roc_auc": {
+    "scorecard": 0.7429598651168745,
+    "lightgbm": 0.7687397655034531,
+    "ci_scorecard": {
+      "lo": 0.7356493547564301,
+      "hi": 0.7497997517876694
+    },
+    "ci_lightgbm": {
+      "lo": 0.7620738918170266,
+      "hi": 0.7753674820217498
+    },
+    "gap_lightgbm_minus_scorecard_ci": {
+      "lo": 0.022544274022186443,
+      "hi": 0.029209358924819198
+    },
+    "n_boot": 1000
+  },
+  "calibration": {
+    "scorecard": {
+      "brier": 0.06880351950946703,
+      "ece": 0.002629321520031926,
+      "note": "unweighted logistic fit, no extra calibrator"
+    },
+    "lightgbm_raw": {
+      "brier": 0.185099789008713,
+      "ece": 0.3145101815571925
+    },
+    "lightgbm_isotonic": {
+      "brier": 0.06733432935071375,
+      "ece": 0.002742809648701067
+    },
+    "mean_pd_scorecard": 0.08049434412430435,
+    "observed_default_rate_test": 0.08072776937710356
+  },
+  "approved_bad_rate_at_20pct_decline": {
+    "scorecard": {
+      "decline_rate": 0.19774645139261504,
+      "approved_share": 0.802253548607385,
+      "bad_rate_approved": 0.05089073995257494,
+      "bad_rate_declined": 0.20177602368031575
+    },
+    "lightgbm": {
+      "decline_rate": 0.19537258345121378,
+      "approved_share": 0.8046274165487862,
+      "bad_rate_approved": 0.046982035686139796,
+      "bad_rate_declined": 0.2197070572569907
+    },
+    "all_applicants": 0.08072776937710356
+  },
+  "psi_train_vs_test": {
+    "score": 8.341270961022582e-05,
+    "max_feature": 0.00036172283989936835,
+    "max_feature_name": "EXT_SOURCE_2",
+    "n_features_above_0.10": 0,
+    "n_features_above_0.25": 0
+  },
+  "data": {
+    "rows_used": 307511,
+    "train": 184506,
+    "calibration": 61502,
+    "test": 61503,
+    "default_rate": 0.08072881945686496,
+    "n_features_encoded": 244,
+    "excluded_from_model": [
+      "CODE_GENDER"
+    ],
+    "sample": null
+  }
+}

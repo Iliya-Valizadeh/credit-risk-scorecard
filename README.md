@@ -60,6 +60,39 @@ README reported 0.736 and 0.734 from a 17,000-row sample. <!-- not-a-claim -->
 The code that drew that sample was never committed, so those numbers can't be checked
 again.
 
+### Binned scorecard baseline
+
+Banks usually score with a binned logistic regression, so I built one as a second
+baseline (`python -m credit_risk_scorecard.woe_scorecard`). Each input is cut into
+bins on the train part only. Numeric bins are merged until the bad rate rises or falls
+in one direction. Each bin gets a weight of evidence ([WoE](docs/glossary.md#woe)), and
+each input gets an information value ([IV](docs/glossary.md#iv)). Inputs with an IV
+under 0.02 are dropped. Inputs whose coefficient came out negative are then dropped one
+at a time and the model is refit. Of 122 inputs, 73 fell below the IV cut, 19 were
+dropped for sign, and 30 stayed. The points scale is 600 points at 50 to 1 good to bad
+odds, and 20 points to double the odds. The full table is
+[reports/scorecard_table.csv](reports/scorecard_table.csv).
+
+| Model | ROC-AUC | 95% interval | Brier | [ECE](docs/glossary.md#ece) | Bad rate among approved |
+|---|---|---|---|---|---|
+| Binned scorecard | 0.743 | 0.736 to 0.750 | 0.0688 | 0.0026 | 5.09% |
+| LightGBM, isotonic | 0.769 | 0.762 to 0.775 | 0.0673 | 0.0027 | 4.70% |
+
+"Bad rate among approved" is the default rate of the applicants left after declining
+the riskiest 20%. The threshold comes from the [calibration](docs/glossary.md#calibration) part. It declined 19.8% of
+test applicants for the scorecard and 19.5% for LightGBM. Among all applicants the
+default rate is 8.07%.
+
+The paired gap (LightGBM minus scorecard) is 0.023 to 0.029 of ROC-AUC, so LightGBM
+still ranks better. The binned scorecard also ranks below the plain logistic
+regression above (0.743 against 0.752). Binning and the IV cut throw some signal away.
+What the scorecard buys is a points table a reviewer can read line by line. Its
+predicted rates need no calibration step, since it is fitted without class weights.
+
+Train against test, the score's [PSI](docs/glossary.md#psi) is 0.0001. The largest
+input PSI is 0.0004, on `EXT_SOURCE_2`. That is expected for a random split, and it
+says nothing about drift over time.
+
 ### Convergence of the logistic regression
 
 The first setup (features scaled but not centred, `saga` solver) hit its 1,000-

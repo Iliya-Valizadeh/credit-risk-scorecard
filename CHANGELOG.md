@@ -4,6 +4,15 @@ All notable changes to this project are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and each release matches a
 git tag.
 
+## [Unreleased]
+
+### Added
+
+- A binned ([WoE](docs/glossary.md#woe)) logistic regression scorecard as a second
+  [baseline](docs/glossary.md#baseline), with points scaling, a saved points table, a
+  train-versus-test [PSI](docs/glossary.md#psi) check and a comparison with LightGBM on
+  the same split (2026-11-16).
+
 ## [1.0.0] - 2026-09-26
 
 ### Added

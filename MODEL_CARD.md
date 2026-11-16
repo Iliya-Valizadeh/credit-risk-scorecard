@@ -70,6 +70,7 @@ or above, which declines the riskiest 20% of the calibration split.
 | ROC-AUC | 0.769 (95% bootstrap interval 0.762 to 0.775) |
 | PR-AUC | 0.254 (0.242 to 0.265) |
 | Logistic regression [baseline](docs/glossary.md#baseline) ROC-AUC | 0.752 (0.745 to 0.759) |
+| Binned ([WoE](docs/glossary.md#woe)) scorecard [baseline](docs/glossary.md#baseline) ROC-AUC | 0.743 (0.736 to 0.750); gap to LightGBM 0.023 to 0.029 |
 | At the decision rule | 19.5% declined, recall 53.2%, precision 22.0% |
 
 ### Calibration

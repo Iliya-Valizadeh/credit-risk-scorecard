@@ -250,6 +250,8 @@ def run(
             pre=pre,
             lgbm=lgbm,
             X_tr=X_tr,
+            X_cal=X_cal,
+            y_cal=y_cal,
             X_te=X_te,
             Xtr=Xtr,
             Xte=Xte,
