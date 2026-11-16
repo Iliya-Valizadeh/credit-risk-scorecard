@@ -50,10 +50,10 @@ packages = ["src/credit_risk_scorecard"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# 53% is the measured coverage of credit_risk_scorecard after the layout move (ADR 0001,
-# decision 8). It only goes up from here; raising it to the template's 80% is a roadmap
-# issue, since the big pipeline functions need the real data or heavy mocking to cover.
-addopts = "-q --cov=credit_risk_scorecard --cov-report=term-missing --cov-fail-under=53"
+# 99% is the measured coverage of credit_risk_scorecard (99.11%, rounded down). It only
+# goes up from here. The pipeline tests run on synthetic data and write to temporary
+# folders, so no real data, database or network is needed.
+addopts = "-q --cov=credit_risk_scorecard --cov-report=term-missing --cov-fail-under=99"
 
 [tool.ruff]
 line-length = 100

@@ -20,3 +20,18 @@ def test_run_end_to_end(applicants: pd.DataFrame) -> None:
     assert m["data"]["excluded_from_model"] == ["CODE_GENDER"]
     md = M.results_markdown(m)
     assert "## Calibration" in md and "ILLUSTRATIVE" in md
+
+
+def test_group_table_leaves_rates_empty_when_a_group_has_no_defaulters() -> None:
+    import numpy as np
+
+    from credit_risk_scorecard import fairness
+
+    groups = np.array(["a"] * 120 + ["b"] * 120)
+    y = np.array([0, 1] * 60 + [0] * 120)  # group b has no defaulters
+    raw = np.linspace(0, 1, 240)
+    t = fairness.group_table(groups, y, raw, raw, threshold=0.5, min_n=100).set_index("group")
+    assert np.isnan(t.loc["b", "tpr"]) and not np.isnan(t.loc["a", "tpr"])
+    # Groups under min_n are dropped.
+    small = fairness.group_table(groups, y, raw, raw, threshold=0.5, min_n=200)
+    assert small.empty

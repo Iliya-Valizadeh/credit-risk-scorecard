@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
 from numpy.typing import NDArray
@@ -76,3 +78,46 @@ def test_expected_loss_counts_only_approved() -> None:
     assert el["loss_implied_by_outcomes"] == pytest.approx(50.0)
     assert el["el_raw_pd"] == pytest.approx((0.1 + 0.2) * 0.5 * 100)
     assert el["el_calibrated_pd"] == pytest.approx(el["el_raw_pd"] / 2)
+
+
+def test_plot_calibration_draws_one_line_per_model_and_saves(
+    scored: tuple[NDArray[np.int_], NDArray[np.float64]], tmp_path: Path
+) -> None:
+    y, p = scored
+    path = tmp_path / "cal.png"
+    fig = E.plot_calibration(y, {"raw": p, "shrunk": p / 2}, path=path, n_bins=5)
+    legend = fig.axes[0].get_legend()
+    assert legend is not None
+    labels = [t.get_text() for t in legend.get_texts()]
+    assert labels == ["raw", "shrunk", "perfect"]
+    assert path.exists() and path.stat().st_size > 0
+
+
+def test_plot_calibration_without_a_path_returns_the_open_figure(
+    scored: tuple[NDArray[np.int_], NDArray[np.float64]],
+) -> None:
+    import matplotlib.pyplot as plt
+
+    y, p = scored
+    fig = E.plot_calibration(y, {"raw": p})
+    assert fig.axes[0].get_xlabel().startswith("Mean predicted PD")
+    plt.close(fig)
+
+
+def test_bootstrap_skips_one_class_resamples() -> None:
+    # One defaulter in six rows: many resamples contain none and have no AUC.
+    from sklearn.metrics import roc_auc_score
+
+    y = np.array([0, 0, 0, 0, 0, 1])
+    s = np.array([0.1, 0.2, 0.1, 0.3, 0.2, 0.9])
+    ci = E.bootstrap_ci(y, {"a": s}, roc_auc_score, n_boot=200)
+    assert 0 <= ci["a"]["lo"] <= ci["a"]["hi"] <= 1
+
+
+def test_headline_returns_both_aucs(
+    scored: tuple[NDArray[np.int_], NDArray[np.float64]],
+) -> None:
+    y, p = scored
+    h = E.headline(y, p)
+    assert set(h) == {"roc_auc", "pr_auc"}
+    assert 0.5 < h["roc_auc"] < 1
